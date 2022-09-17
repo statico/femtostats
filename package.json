@@ -17,6 +17,7 @@
     "@chakra-ui/react": "^2.3.2",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "dotenv": "^16.0.2",
     "framer-motion": "^7.3.5",
     "knex": "^2.3.0",
     "next": "^12.3.0",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.0",
+    "@types/dotenv": "^8.2.0",
     "@types/knex": "^0.16.1",
     "@types/node": "18.7.18",
     "@types/react": "18.0.20",
