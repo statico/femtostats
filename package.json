@@ -1,0 +1,23 @@
+{
+  "name": "femtostats",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "git@github.com:statico/femtostats.git",
+  "author": "Ian Langworth <ian@langworth.com>",
+  "license": "GPL-3.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  },
+  "dependencies": {
+    "next": "^12.3.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
