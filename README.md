@@ -7,12 +7,12 @@ Super lightweight and tiny web statistics provider
 ## Big List o' Ideas
 
 - [x] Dockerizable & low memory use
-- [_] Track page loads
-- [_] Put stats on disk (SQLite)
-- [_] Make a simple dashboard with date range selection
-- [_] Track arbitrary events
-- [_] Track page errors
-- [_] Normalize hostnames, path, and query params
-- [_] Store IPs (use X-Forwarded-For)
-- [_] Realtime visitors display
-- [_] Simple authentication
+- [ ] Track page loads
+- [ ] Put stats on disk (SQLite)
+- [ ] Make a simple dashboard with date range selection
+- [ ] Track arbitrary events
+- [ ] Track page errors
+- [ ] Normalize hostnames, path, and query params
+- [ ] Store IPs (use X-Forwarded-For)
+- [ ] Realtime visitors display
+- [ ] Simple authentication
