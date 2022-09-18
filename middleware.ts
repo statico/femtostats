@@ -10,7 +10,11 @@ export function middleware(req: NextRequest) {
 
   try {
     const auth = req.headers.get("authorization") || "";
+
+    // Buffer is not available in the Next Edge environment, so use atob
+    // https://edge-runtime.vercel.app/features/available-apis
     const [username, password] = atob(auth.substring(5)).split(":");
+
     if (username !== HARDCODED_USERNAME || password !== secret)
       throw new Error("Invalid credentials");
     return NextResponse.next();
