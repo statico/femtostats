@@ -3,7 +3,11 @@ import db from "lib/db";
 import { GetServerSideProps } from "next";
 
 export const getServerSideProps: GetServerSideProps = async ({}) => {
-  const data = await db.select().from("events").orderBy("timestamp", "desc");
+  const data = await db
+    .select()
+    .from("events")
+    .limit(1000)
+    .orderBy("timestamp", "desc");
   return { props: { data } };
 };
 
