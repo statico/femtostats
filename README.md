@@ -16,3 +16,6 @@ Super lightweight and tiny web statistics provider
 - [ ] Store IPs (use X-Forwarded-For)
 - [ ] Realtime visitors display
 - [ ] Simple authentication
+- [ ] better-sqlite3 driver
+- [ ] Load test with hey
+- [ ] Watch for hash changes to trigger pageview
