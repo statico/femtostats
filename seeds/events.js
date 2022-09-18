@@ -54,8 +54,9 @@ exports.seed = async function (knex) {
 
   const REFERRERS = [null, "www.facebook.com", "www.reddit.com", "twitter.com"];
 
+  const NOW = Math.floor(Date.now() / 1000);
+
   const rows = [];
-  const now = Date.now();
   for (let i = 0; i < 1e6; i++) {
     const info = pick(AGENTS);
     let userAgent, width;
@@ -68,7 +69,7 @@ exports.seed = async function (knex) {
     const ua = UAParser(userAgent);
 
     const row = {
-      timestamp: now - Math.floor(Math.random() * 7776000),
+      timestamp: NOW - Math.floor(Math.random() * 7776000),
       name: "pageview",
       hostname: "www.example.com",
       pathname: pick(PATHS),

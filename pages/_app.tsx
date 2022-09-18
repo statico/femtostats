@@ -5,6 +5,7 @@ import Head from "next/head";
 import { ReactElement, ReactNode } from "react";
 import { RecoilRoot } from "recoil";
 import { SWRConfig } from "swr";
+import fetch from "unfetch";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -12,6 +13,15 @@ export type NextPageWithLayout = NextPage & {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+};
+
+const fetcher = async (resource: string, init: any) => {
+  const res = await fetch(resource, { ...init });
+  if (!res.ok) {
+    console.error(`Fetch to ${resource} failed: ${res.statusText}`);
+    return { error: res.statusText };
+  }
+  return res.json();
 };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
@@ -23,7 +33,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <link rel="icon" sizes="256x256" href="/favicon.png" />
       </Head>
       <ChakraProvider resetCSS>
-        <SWRConfig>
+        <SWRConfig value={{ fetcher }}>
           <RecoilRoot>
             <Component {...pageProps} />
           </RecoilRoot>
