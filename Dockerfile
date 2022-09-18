@@ -40,6 +40,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Needed for migrations
+RUN yarn global add knex
+COPY --from=builder /app/knexfile.js ./
+COPY --from=builder /app/migrations ./migrations
+
 USER nextjs
 
 EXPOSE 3000
