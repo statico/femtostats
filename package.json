@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "yarn exec knex migrate:latest && next start",
+    "start": "yarn exec knex migrate:latest && node server.js",
     "lint": "next lint",
     "prepare": "husky install"
   },
