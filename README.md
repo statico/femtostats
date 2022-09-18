@@ -11,13 +11,13 @@ Super lightweight and tiny web statistics provider
 - [x] Dockerizable & low memory use
 - [x] Track page loads
 - [x] Put stats on disk (SQLite)
-- [ ] Make a simple dashboard with date range selection
+- [x] Make a simple dashboard with date range selection
 - [x] Track arbitrary events
 - [ ] Track page errors
 - [x] Normalize hostnames, path, and query params
-- [ ] Realtime visitors display
 - [ ] Simple authentication
-- [ ] better-sqlite3 driver
-- [ ] Load test with hey
 - [ ] Watch for hash changes to trigger pageview
+- [ ] Load test with hey
+- [ ] better-sqlite3 driver
+- [ ] Realtime visitors display
 - [ ] Support other databases

@@ -1,4 +1,5 @@
 import { Button, Container, Heading } from "@chakra-ui/react";
+import Link from "next/link";
 import Script from "next/script";
 
 export default function Page() {
@@ -13,6 +14,9 @@ export default function Page() {
       >
         Track Click Event
       </Button>
+      <Link href="/test2">
+        <a>Go to Test 2</a>
+      </Link>
       <Script defer src="/fs.js" />
     </Container>
   );
