@@ -1,8 +1,10 @@
+![logo](https://raw.githubusercontent.com/statico/femtostats/main/public/favicon.png)
+
 # femtostats
 
-Super lightweight and tiny web statistics provider
-
 [![build status](https://img.shields.io/github/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?style=flat-square)](https://ghcr.io/statico/femtostats)
+
+Super lightweight and tiny web statistics provider
 
 ## Big List o' Ideas
 
@@ -18,3 +20,4 @@ Super lightweight and tiny web statistics provider
 - [ ] better-sqlite3 driver
 - [ ] Load test with hey
 - [ ] Watch for hash changes to trigger pageview
+- [ ] Support other databases

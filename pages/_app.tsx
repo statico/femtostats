@@ -1,6 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
+import Head from "next/head";
 import { ReactElement, ReactNode } from "react";
 import { RecoilRoot } from "recoil";
 import { SWRConfig } from "swr";
@@ -16,6 +17,11 @@ type AppPropsWithLayout = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
+      <Head>
+        <link rel="shortcut icon" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="icon" sizes="256x256" href="/favicon.png" />
+      </Head>
       <ChakraProvider resetCSS>
         <SWRConfig>
           <RecoilRoot>
