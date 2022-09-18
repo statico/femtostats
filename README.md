@@ -13,10 +13,10 @@ Super lightweight and tiny web statistics provider
 - [x] Put stats on disk (SQLite)
 - [x] Make a simple dashboard with date range selection
 - [x] Track arbitrary events
-- [ ] Track page errors
+- [x] Track page errors
 - [x] Normalize hostnames, path, and query params
 - [ ] Simple authentication
-- [ ] Watch for hash changes to trigger pageview
+- [x] Watch for hash changes to trigger pageview
 - [ ] Load test with hey
 - [ ] better-sqlite3 driver
 - [ ] Realtime visitors display
