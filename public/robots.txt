@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /fs.js
+Allow: /fs.debug.js
+Disallow: /
