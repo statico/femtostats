@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "knex migrate:latest && next start",
     "lint": "next lint",
     "prepare": "husky install"
   },
