@@ -1,5 +1,6 @@
 import assert from "assert";
 import db from "lib/db";
+import { getCountryForIP } from "lib/geoip";
 import { singleParam } from "lib/misc";
 import { NextApiRequest, NextApiResponse } from "next";
 import { UAParser } from "ua-parser-js";
@@ -40,6 +41,10 @@ const track = async (req: NextApiRequest) => {
 
   const body = JSON.parse(req.body);
   const ua = UAParser(singleParam(req.headers["user-agent"]));
+  const ip =
+    singleParam(req.headers["x-forwarded-for"]).split(",").pop()?.trim() ||
+    req.socket.remoteAddress;
+  const country = ip ? await getCountryForIP(ip) : null;
 
   await db("events").insert({
     timestamp: Math.floor(Date.now() / 1000),
@@ -50,5 +55,6 @@ const track = async (req: NextApiRequest) => {
     os: ua.os.name,
     browser: ua.browser.name,
     screen_width: Number(body.sw),
+    country,
   });
 };

@@ -29,11 +29,20 @@ I needed:
 1. Include the tag `<script defer src="https://your-femtostats.com/fs.js"></script>` on the pages you want to track.
 1. Page views (including history changes on SPAs) are tracked automatically. For custom events, call `window.femtostats('event name')`
 
+### Enabling Country Resolution
+
+To record which country the user has originated from, you need a geoip database. Femtostats will automatically download a free one from Maxmind and refresh it once a week if you do the following:
+
+1. Go to https://www.maxmind.com/ and register for a free account
+1. Under "Manage License Keys", get a license key
+1. Under "Download Files", scroll to the "GeoLite2 Country" row and click "Get Permalinks". Get the database URL (it will look like `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=YOUR_LICENSE_KEY&suffix=tar.gz`) and replace `YOUR_LICENSE_KEY` with your license key.
+1. Set this URL as an environment variable `MAXMIND_GEOLITE2_COUNTRY_URL`
+
 ## Development
 
 Requires Node.js 16+ and Yarn. Run `yarn` and `yarn dev`.
 
-The default database location is `/tmp/femtostats.db`. Run `yarn exec knex seed:run` to populate the database with some sample data.
+The default database location is `/tmp/stats.db`. Run `yarn exec knex seed:run` to populate the database with some sample data.
 
 This project uses [Next.js](https://nextjs.org/), [React](https://reactjs.org/), [SWR](https://swr.vercel.app/), [Recoil](https://recoiljs.org/), [Chakra UI](https://chakra-ui.com/), and [Chart.js](https://www.chartjs.org/).
 
