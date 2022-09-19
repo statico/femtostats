@@ -11,7 +11,7 @@ https://user-images.githubusercontent.com/137158/190950407-550e8361-2ae0-42d8-96
 I needed:
 
 - A simple way to track visits on various web properties I manage
-- A way to collect statistics without using the privacy-invasive Google Analytics, half of my visitors probably block
+- A way to collect statistics without using the privacy-invasive Google Analytics, which half of my visitors probably block
 - The ability to track custom events triggered from JavaScript, as well as other client-side stats like screen size
 - Realtime visitor count when there are surges
 - A container that I can add to `docker-compose.yml` or host on [Fly.io](https://fly.io/) trivially
