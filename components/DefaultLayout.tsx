@@ -4,6 +4,8 @@ import {
   Heading,
   HStack,
   Image,
+  LinkBox,
+  LinkOverlay,
   Stack,
 } from "@chakra-ui/react";
 import Head from "next/head";
@@ -22,10 +24,14 @@ export default function DefaultLayout({ title, children }: Props) {
       </Head>
       <Container maxW="container.xl" py={4}>
         <Stack spacing={4}>
-          <HStack as="header">
-            <Image src="/favicon.png" boxSize={10} alt="Femtostats logo" />
-            <Heading>Femtostats</Heading>
-          </HStack>
+          <LinkBox>
+            <HStack as="header">
+              <Image src="/favicon.png" boxSize={10} alt="Femtostats logo" />
+              <LinkOverlay href="/">
+                <Heading>Femtostats</Heading>
+              </LinkOverlay>
+            </HStack>
+          </LinkBox>
           <Box as="main">{children}</Box>
         </Stack>
       </Container>
