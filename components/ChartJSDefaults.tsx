@@ -10,12 +10,17 @@ export const ChartJSDefaults = () => {
     grid: useColorModeValue(c.gray[300], c.gray[800]),
   };
 
-  ChartJS.defaults.responsive = true;
-  ChartJS.defaults.color = colors.text;
-  ChartJS.defaults.plugins.legend.display = false;
-  ChartJS.defaults.datasets.line.pointRadius = 0;
-  ChartJS.defaults.datasets.line.borderColor = colors.accent;
-  ChartJS.defaults.scale.grid.color = colors.grid;
+  try {
+    ChartJS.defaults.responsive = true;
+    ChartJS.defaults.color = colors.text;
+    ChartJS.defaults.plugins.legend.display = false;
+    ChartJS.defaults.datasets.line.pointRadius = 0;
+    ChartJS.defaults.datasets.line.borderColor = colors.accent;
+    ChartJS.defaults.scale.grid.color = colors.grid;
+  } catch (err) {
+    // There might not be any charts on the page, in which case ChartJS didn't
+    // get initialized.
+  }
 
   // @ts-ignore - duration attribute isn't in the types
   ChartJS.defaults.animation.duration = 300;

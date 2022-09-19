@@ -1,5 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import { ChartJSDefaults } from "components/ChartJSDeafults";
+import { ChartJSDefaults } from "components/ChartJSDefaults";
 import { theme } from "lib/theme";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
