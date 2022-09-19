@@ -17,7 +17,13 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
+import {
+  CheckerReturnType,
+  number,
+  object,
+  optional,
+  string,
+} from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { useBufferedValue } from "hooks/useBufferedValue";
@@ -30,6 +36,7 @@ import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
 
 const viewChecker = object({
+  hostname: optional(string()),
   start: optional(number()),
   end: optional(number()),
 });
@@ -39,6 +46,7 @@ type ViewState = CheckerReturnType<typeof viewChecker>;
 const viewState = atom<ViewState>({
   key: "view",
   default: {
+    hostname: undefined,
     start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
     end: Math.floor(DateTime.now().toSeconds()),
   },
@@ -83,11 +91,26 @@ const Card = ({ children }: { children: ReactNode }) => (
   </Stack>
 );
 
-const HostnameSelector = () => (
-  <Select maxW="xs">
-    <option>TODO: hostname</option>
-  </Select>
-);
+const HostnameSelector = () => {
+  const [view, setView] = useRecoilState(viewState);
+  const { data } = useSWR("/api/stats/hostnames");
+  return (
+    <Select
+      maxW="xs"
+      defaultValue={view.hostname}
+      onChange={(e) => {
+        const hostname = e.target.value || undefined;
+        setView({ ...view, hostname });
+      }}
+    >
+      <option value="">All Hostnames</option>
+      {data &&
+        data.hostnames.map((hostname: string) => (
+          <option key={hostname}>{hostname}</option>
+        ))}
+    </Select>
+  );
+};
 
 const DateRangeSelector = () => {
   const [view, setView] = useRecoilState(viewState);
