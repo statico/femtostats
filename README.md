@@ -25,7 +25,7 @@ I needed:
 
 ## Getting Started
 
-1. Host the image `ghcr.io/statico/femtostats` wherever you want. Check out the `docker-compose.yml` file in this repo as an example.
+1. Host the image `ghcr.io/statico/femtostats` wherever you want. Check out the `docker-compose.yml` file in this repo as an example. Specify a `PASSWORD` env var to protect your dashboard behind a password (the username is `admin`).
 1. Include the tag `<script defer src="https://your-femtostats.com/fs.js"></script>` on the pages you want to track.
 1. Call `window.femtostats('event name')` for custom events
 
