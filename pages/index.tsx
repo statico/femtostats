@@ -5,22 +5,38 @@ import { toURL } from "lib/misc";
 import { DateTime } from "luxon";
 import { ReactElement, useState } from "react";
 import { Chart } from "react-chartjs-2";
+import { atom, useRecoilState } from "recoil";
 import useSWR from "swr";
 
-export default function Page() {
-  const [days, setDays] = useState(31);
-  const start = Math.floor(DateTime.now().minus({ days }).toSeconds());
-  const end = Math.floor(DateTime.now().toSeconds());
+type ViewState = {
+  start: number;
+  end: number;
+};
 
-  const { data } = useSWR(toURL("/api/stats/pageviews-by-day", { start, end }));
+const viewState = atom<ViewState>({
+  key: "view",
+  default: {
+    start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
+    end: Math.floor(DateTime.now().toSeconds()),
+  },
+});
+
+export default function Page() {
+  const [view, setView] = useRecoilState(viewState);
+  const { data } = useSWR(toURL("/api/stats/dashboard", view));
 
   return (
     <>
       <Stack borderRadius="lg" bg="gray.700" p={4}>
         <Box maxW="xs">
           <Select
+            defaultValue="31"
             onChange={(e) => {
-              setDays(Number(e.target.value));
+              const days = Number(e.target.value);
+              setView({
+                ...view,
+                start: Math.floor(DateTime.now().minus({ days }).toSeconds()),
+              });
             }}
           >
             <option value="7">Last Week</option>
