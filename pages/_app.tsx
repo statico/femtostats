@@ -1,14 +1,15 @@
-import { Chart as ChartJS } from "chart.js";
-import { ChakraProvider, useColorModeValue } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
+import { ChartJSDefaults } from "components/ChartJSDeafults";
 import { theme } from "lib/theme";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { ReactElement, ReactNode } from "react";
 import { RecoilRoot } from "recoil";
+import { RecoilURLSyncJSON } from "recoil-sync";
 import { SWRConfig } from "swr";
 import fetch from "unfetch";
-import { ChartJSDefaults } from "components/ChartJSDeafults";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -28,6 +29,7 @@ const fetcher = async (resource: string, init: any) => {
 };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const router = useRouter();
   const getLayout = Component.getLayout ?? ((page) => page);
   return (
     <>
@@ -39,8 +41,20 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <ChakraProvider resetCSS theme={theme}>
         <SWRConfig value={{ fetcher }}>
           <RecoilRoot>
-            <ChartJSDefaults />
-            {getLayout(<Component {...pageProps} />)}
+            <RecoilURLSyncJSON
+              location={{ part: "queryParams" }}
+              // SSR: https://github.com/facebookexperimental/Recoil/issues/1777
+              browserInterface={{
+                getURL: () => {
+                  return typeof window === "undefined"
+                    ? `http://localhost:3001${router.route}`
+                    : window.location.href;
+                },
+              }}
+            >
+              <ChartJSDefaults />
+              {getLayout(<Component {...pageProps} />)}
+            </RecoilURLSyncJSON>
           </RecoilRoot>
         </SWRConfig>
       </ChakraProvider>

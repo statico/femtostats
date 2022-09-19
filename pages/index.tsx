@@ -1,17 +1,21 @@
 import { Box, Select, Stack } from "@chakra-ui/react";
+import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { toURL } from "lib/misc";
 import { DateTime } from "luxon";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import { Chart } from "react-chartjs-2";
 import { atom, useRecoilState } from "recoil";
+import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
 
-type ViewState = {
-  start: number;
-  end: number;
-};
+const viewChecker = object({
+  start: optional(number()),
+  end: optional(number()),
+});
+
+type ViewState = CheckerReturnType<typeof viewChecker>;
 
 const viewState = atom<ViewState>({
   key: "view",
@@ -19,6 +23,7 @@ const viewState = atom<ViewState>({
     start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
     end: Math.floor(DateTime.now().toSeconds()),
   },
+  effects: [syncEffect({ refine: viewChecker })],
 });
 
 export default function Page() {

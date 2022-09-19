@@ -15,7 +15,7 @@ Super lightweight and tiny web statistics provider
 - [x] Track arbitrary events
 - [x] Track page errors
 - [x] Normalize hostnames, path, and query params
-- [ ] Simple authentication
+- [x] Simple authentication
 - [x] Watch for hash changes to trigger pageview
 - [ ] Load test with hey
 - [ ] better-sqlite3 driver
