@@ -1,4 +1,15 @@
-import { Box, Select, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Select,
+  Skeleton,
+  SkeletonText,
+  Stack,
+  Stat,
+  StatHelpText,
+  StatLabel,
+  StatNumber,
+} from "@chakra-ui/react";
 import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
@@ -32,9 +43,22 @@ export default function Page() {
 
   return (
     <>
-      <Stack borderRadius="lg" bg="gray.700" p={4}>
-        <Box maxW="xs">
+      <Stack spacing={4} borderRadius="lg" bg="gray.700" p={4}>
+        <Flex justify="space-between">
+          <Stat>
+            <StatLabel>Total Page Views</StatLabel>
+            {data ? (
+              <StatNumber>
+                {Number(
+                  data.values.reduce((a: number, b: number) => a + b, 0)
+                ).toLocaleString()}
+              </StatNumber>
+            ) : (
+              <Skeleton mt={2} h={6} w={24} />
+            )}
+          </Stat>
           <Select
+            maxW="xs"
             defaultValue="31"
             onChange={(e) => {
               const days = Number(e.target.value);
@@ -48,9 +72,9 @@ export default function Page() {
             <option value="31">Last Month</option>
             <option value="90">Last 90 Days</option>
           </Select>
-        </Box>
+        </Flex>
 
-        {data && (
+        {data ? (
           <Chart
             datasetIdKey="pageviews-by-day"
             type="line"
@@ -64,6 +88,8 @@ export default function Page() {
               ],
             }}
           />
+        ) : (
+          <Skeleton h="500px" />
         )}
       </Stack>
     </>
