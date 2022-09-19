@@ -1,12 +1,9 @@
 import {
-  Box,
   Flex,
   Select,
   Skeleton,
-  SkeletonText,
   Stack,
   Stat,
-  StatHelpText,
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
@@ -14,12 +11,13 @@ import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { toURL } from "lib/misc";
-import { DateTime } from "luxon";
-import { ReactElement } from "react";
+import { ReactElement, useMemo } from "react";
 import { Chart } from "react-chartjs-2";
 import { atom, useRecoilState } from "recoil";
 import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
+import { DateTime } from "luxon";
+import { useBufferedValue } from "hooks/useBufferedValue";
 
 const viewChecker = object({
   start: optional(number()),
@@ -39,7 +37,8 @@ const viewState = atom<ViewState>({
 
 export default function Page() {
   const [view, setView] = useRecoilState(viewState);
-  const { data } = useSWR(toURL("/api/stats/dashboard", view));
+  const { data: raw } = useSWR(toURL("/api/stats/dashboard", view));
+  const data = useBufferedValue(raw);
 
   return (
     <>
@@ -74,23 +73,7 @@ export default function Page() {
           </Select>
         </Flex>
 
-        {data ? (
-          <Chart
-            datasetIdKey="pageviews-by-day"
-            type="line"
-            data={{
-              labels: data.labels,
-              datasets: [
-                {
-                  label: "Page Views",
-                  data: data.values,
-                },
-              ],
-            }}
-          />
-        ) : (
-          <Skeleton h="500px" />
-        )}
+        <PageViewChart data={data} />
       </Stack>
     </>
   );
@@ -99,3 +82,38 @@ export default function Page() {
 Page.getLayout = (page: ReactElement) => {
   return <DefaultLayout title="Dashboard">{page}</DefaultLayout>;
 };
+
+const PageViewChart = ({ data }: { data: any }) =>
+  data ? (
+    <Chart
+      datasetIdKey="pageviews-by-day"
+      type="line"
+      data={{
+        labels: data.labels,
+        datasets: [
+          {
+            label: "Page Views",
+            data: data.values,
+            spanGaps: true,
+          },
+        ],
+      }}
+      options={{
+        scales: {
+          x: {
+            ticks: {
+              callback: function (val, index) {
+                return index % 2 === 0
+                  ? DateTime.fromISO(
+                      this.getLabelForValue(Number(val))
+                    ).toFormat("ccc, d LLL")
+                  : "";
+              },
+            },
+          },
+        },
+      }}
+    />
+  ) : (
+    <Skeleton h="500px" />
+  );
