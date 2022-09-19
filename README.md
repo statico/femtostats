@@ -1,10 +1,12 @@
-![logo](https://raw.githubusercontent.com/statico/femtostats/main/public/favicon.png)
+<img src="https://raw.githubusercontent.com/statico/femtostats/main/public/favicon.png" alt="logo" with="64" height="64"/>
 
 # femtostats
 
 [![build status](https://img.shields.io/github/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?style=flat-square)](https://ghcr.io/statico/femtostats)
 
-Super lightweight and tiny web statistics provider
+https://user-images.githubusercontent.com/137158/190950407-550e8361-2ae0-42d8-96e2-6bd8b152e0d2.mp4
+
+Super lightweight, tiny, privacy-focused web statistics provider
 
 ## Big List o' Ideas
 
