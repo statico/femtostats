@@ -20,7 +20,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     if (hostname) q.where("hostname", hostname);
   };
 
-  const [pageviews, topSources, topPathnames] = await Promise.all([
+  const [pageviews, topReferrers, topPathnames] = await Promise.all([
     // pageviews
     db
       .select(
@@ -35,7 +35,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         values: rows.map((row: any) => row.count),
       })),
 
-    // topSources
+    // topReferrers
     db
       .with(
         "top",
@@ -43,11 +43,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .select("referrer", db.raw("count(*) as count"))
           .from("events")
           .where(filter)
+          .andWhere("name", "pageview")
           .groupBy("referrer")
       )
       .select()
       .from("top")
-      .orderBy("count", "desc"),
+      .orderBy("count", "desc")
+      .limit(10),
 
     // topPathnames
     db
@@ -57,17 +59,19 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .select("pathname", db.raw("count(*) as count"))
           .from("events")
           .where(filter)
+          .andWhere("name", "pageview")
           .groupBy("pathname")
       )
       .select()
       .from("top")
-      .orderBy("count", "desc"),
+      .orderBy("count", "desc")
+      .limit(10),
   ]);
 
   res.send(
     JSON.stringify({
       pageviews,
-      topSources,
+      topReferrers,
       topPathnames,
     })
   );

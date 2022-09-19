@@ -20,7 +20,7 @@ export default function DefaultLayout({ title, children }: Props) {
   return (
     <>
       <Head>
-        <title>{title} | Femtostats</title>
+        <title>{`${title} | Femtostats`}</title>
       </Head>
       <Container maxW="container.xl" py={4}>
         <Stack spacing={4}>
