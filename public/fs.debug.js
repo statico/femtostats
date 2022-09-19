@@ -1,16 +1,25 @@
 "use strict";
 
+// This script is written to be as browser-compatible as we can reasonably make
+// it. That's why we're using var and not const/let, and that's why it's
+// minified with UglifyJS instead of terser.
+
 !(function () {
+  // Factoring these out helps with minificiation.
+  var w = window;
+  var h = w.history;
+  var l = w.location;
+
   // What host will we make a POST request to?
-  var host = new URL(window.document.currentScript.src).origin;
+  var host = new URL(w.document.currentScript.src).origin;
 
   // Global event tracking function
   function trackEvent(name, data) {
     var body = {
       n: name,
-      u: window.location.href,
-      r: window.location.referrer,
-      sw: window.innerWidth,
+      u: l.href,
+      r: l.referrer,
+      sw: w.innerWidth,
       d: data,
     };
 
@@ -20,17 +29,17 @@
   }
 
   // Handle page errors
-  var oldOnError = window.onerror;
+  var oldOnError = w.onerror;
   if (typeof oldOnError !== "function") oldOnError = function () {};
-  window.onerror = function (message, url, line, column, error) {
+  w.onerror = function (message, url, line, column, error) {
     trackEvent("error", { message, url, line, column, error: String(error) });
     oldOnError(message, url, line, column, error);
   };
 
   // Handle uncaught rejections from promises
-  var oldOnUnRej = window.unhandledrejection;
+  var oldOnUnRej = w.unhandledrejection;
   if (typeof oldOnUnRej !== "function") oldOnUnRej = function () {};
-  window.onunhandledrejection = function (error) {
+  w.onunhandledrejection = function (error) {
     trackEvent("error", { error: String(error) });
     oldOnUnRej(error);
   };
@@ -41,17 +50,17 @@
   }, 1);
 
   // Track any hash changes as page views for SPAs
-  window.addEventListener("popstate", function () {
+  w.addEventListener("popstate", function () {
     trackEvent("pageview");
   });
-  if (window.history && window.history.pushState) {
-    var oldPushState = window.history.pushState;
-    window.history.pushState = function () {
+  if (h && h.pushState) {
+    var oldPushState = h.pushState;
+    h.pushState = function () {
       oldPushState.apply(this, arguments);
       trackEvent("pageview");
     };
   }
 
   // Done
-  window.femtostats = trackEvent;
+  w.femtostats = trackEvent;
 })();
