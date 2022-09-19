@@ -49,7 +49,10 @@ export default function Page() {
             {data ? (
               <StatNumber>
                 {Number(
-                  data.values.reduce((a: number, b: number) => a + b, 0)
+                  data.pageviews.values.reduce(
+                    (a: number, b: number) => a + b,
+                    0
+                  )
                 ).toLocaleString()}
               </StatNumber>
             ) : (
@@ -73,7 +76,7 @@ export default function Page() {
           </Select>
         </Flex>
 
-        <PageViewChart data={data} />
+        <PageViewChart data={data?.pageviews} />
       </Stack>
     </>
   );
