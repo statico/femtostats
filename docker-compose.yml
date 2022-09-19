@@ -1,0 +1,14 @@
+version: "2.4"
+services:
+  femtostats:
+    image: ghcr.io/statico/femtostats
+    container_name: femtostats
+    user: nextjs
+    volumes:
+      - ~/stats:/data
+    environment:
+      DB_PATH: "/data/stats.db"
+      PASSWORD: "sekrit"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: always
