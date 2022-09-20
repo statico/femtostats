@@ -1,9 +1,12 @@
+const { randomUUID } = require("crypto");
+const { DateTime } = require("luxon");
 const UAParser = require("ua-parser-js");
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 exports.seed = async function (knex) {
   await knex("events").del();
+  await knex("sessions").del();
 
   const PATHS = [
     "/apple",
@@ -52,12 +55,16 @@ exports.seed = async function (knex) {
     1366, 1920, 1440, 768, 1600, 1280, 1536, 1024, 1280, 1280, 1680,
   ];
 
+  // No preference — I'm simply picking countries where I currently have coworkers
+  const COUNTRIES = ["US", "CA", "UK", "IN", "BR", "UY", "GB", "PL"];
+
   const REFERRERS = [null, "www.facebook.com", "www.reddit.com", "twitter.com"];
 
   const NOW = Math.floor(Date.now() / 1000);
 
   const rows = [];
-  for (let i = 0; i < 1e6; i++) {
+  const extra = [];
+  for (let i = 0; i < 1e5; i++) {
     const info = pick(AGENTS);
     let userAgent, width;
     if (Array.isArray(info)) {
@@ -70,18 +77,22 @@ exports.seed = async function (knex) {
 
     const row = {
       timestamp: NOW - Math.floor(Math.random() * 7776000),
+      session_id: randomUUID(),
       name: "pageview",
-      hostname: "www.example.com",
+      hostname: `${Math.random() > 0.5 ? "foo" : "bar"}.example.com`,
       pathname: pick(PATHS),
       referrer: pick(REFERRERS),
+      country: pick(COUNTRIES),
       os: ua.os.name,
+      os_version: ua.os.version,
       browser: ua.browser.name,
+      browser_version: ua.browser.version,
       screen_width: width,
     };
     rows.push(row);
 
     if (Math.random() < 0.001) {
-      rows.push({
+      extra.push({
         ...row,
         name: "buy-now-click",
       });
@@ -89,4 +100,22 @@ exports.seed = async function (knex) {
   }
 
   await knex.batchInsert("events", rows, 100);
+  await knex.batchInsert("events", extra, 100);
+  await knex.batchInsert(
+    "sessions",
+    rows.map((row) => ({
+      id: row.session_id,
+      hostname: row.hostname,
+      started_at: row.timestamp,
+      ended_at:
+        Math.random() > 0.5
+          ? null
+          : Math.floor(
+              DateTime.fromSeconds(row.timestamp).plus({
+                minutes: Math.random() * 5,
+              }) / 1000
+            ),
+    })),
+    100
+  );
 };
