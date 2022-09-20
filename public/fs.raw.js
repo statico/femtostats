@@ -9,14 +9,68 @@
   var w = window;
   var h = w.history;
   var l = w.location;
+  var d = w.document;
+
+  // IE isn't supported.
+  if (!d.currentScript || typeof URL === "undefined") return;
 
   // What host will we make a POST request to?
-  var host = new URL(w.document.currentScript.src).origin;
+  var host = new URL(d.currentScript.src).origin;
+
+  // We need a session ID somehow. UUIDs are recognizable as being opaque and
+  // random. From https://stackoverflow.com/a/8809472
+  function generateUUID() {
+    var t = new Date().getTime();
+    var t2 =
+      (typeof performance !== "undefined" &&
+        performance.now &&
+        performance.now() * 1000) ||
+      0;
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function (char) {
+        var r = Math.random() * 16;
+        if (t > 0) {
+          r = (t + r) % 16 | 0;
+          t = Math.floor(t / 16);
+        } else {
+          r = (t2 + r) % 16 | 0;
+          t2 = Math.floor(t2 / 16);
+        }
+        return (char === "x" ? r : (r & 0x3) | 0x8).toString(16);
+      }
+    );
+  }
+
+  // Allow Femtostats to operate in cookieless mode for easier compliance with
+  // local laws. A session won't be as accurate, but what can you do? fs.js.tsx
+  // will change this to false if NO_COOKIES is set.
+  var useCookies = true;
+
+  // Create or retrieve a session ID
+  var sessionId;
+  if (useCookies) {
+    var cookies = d.cookie.split("; ");
+    for (var i = 0; i < cookies.length; i++) {
+      var parts = cookies[i].split("=");
+      if (parts[0] === "sid") {
+        sessionId = parts[1];
+      }
+    }
+    if (!sessionId) {
+      sessionId = generateUUID();
+      console.log("sid=" + sessionId + ";samesite=lax");
+      d.cookie = "sid=" + sessionId + ";samesite=lax";
+    }
+  } else {
+    sessionId = generateUUID();
+  }
 
   // Global event tracking function
   function trackEvent(name, data) {
     var body = {
       n: name,
+      s: sessionId,
       u: l.href,
       r: l.referrer,
       sw: w.innerWidth,

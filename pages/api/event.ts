@@ -45,9 +45,10 @@ const track = async (req: NextApiRequest) => {
     singleParam(req.headers["x-forwarded-for"]).split(",").pop()?.trim() ||
     req.socket.remoteAddress;
   const country = ip ? await getCountryForIP(ip) : null;
+  const now = Math.floor(Date.now() / 1000);
 
   await db("events").insert({
-    timestamp: Math.floor(Date.now() / 1000),
+    timestamp: now,
     name: body.n,
     hostname: getHostname(body.u),
     pathname: getPathname(body.u),
@@ -57,4 +58,15 @@ const track = async (req: NextApiRequest) => {
     screen_width: Number(body.sw),
     country,
   });
+
+  if (body.s) {
+    await db("sessions")
+      .insert({
+        id: body.s,
+        hostname: getHostname(body.u),
+        started_at: now,
+      })
+      .onConflict(["id"])
+      .merge();
+  }
 };

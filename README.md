@@ -38,6 +38,10 @@ To record which country the user has originated from, you need a geoip database.
 1. Under "Download Files", scroll to the "GeoLite2 Country" row and click "Get Permalinks". Get the database URL (it will look like `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=YOUR_LICENSE_KEY&suffix=tar.gz`) and replace `YOUR_LICENSE_KEY` with your license key.
 1. Set this URL as an environment variable `MAXMIND_GEOLITE2_COUNTRY_URL`
 
+### Disabling Cookies
+
+By default, Femtostats stores a simple cookie on the client to keep track of user sessions. You can disable the use of cookies entirely by setting the env var `NO_COOKIES=1`. Sessions will still show in the dashboard, but without cookies, the definition of a session changes from "a user's browser session" to "a single page view."
+
 ## Development
 
 Requires Node.js 16+ and Yarn. Run `yarn` and `yarn dev`.
