@@ -38,3 +38,11 @@ export const toURL = (base: string, queryParams?: QueryParams): string => {
     return base;
   }
 };
+
+export const formatNumber = (value: any) => Number(value).toLocaleString();
+
+export const statType = (a: number, b: number) =>
+  a > b ? "decrease" : "increase";
+
+export const statPercent = (a: number, b: number) =>
+  Math.round((b / a - 1) * 100) + "%";

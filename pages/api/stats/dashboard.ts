@@ -1,6 +1,12 @@
-import { Knex } from "knex";
-import db from "lib/db";
 import { singleParam } from "lib/misc";
+import {
+  averageSessionDuration,
+  countPageviews,
+  countSessions,
+  pageviewsByDay,
+  uniquePathnames,
+  uniqueReferrers,
+} from "lib/stats";
 import { DateTime } from "luxon";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -14,65 +20,44 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     Number(singleParam(req.query.end)) || DateTime.now().toSeconds()
   );
 
-  const filter = (q: Knex.QueryBuilder) => {
-    q.where("timestamp", ">=", Math.floor(start.toSeconds()));
-    q.where("timestamp", "<=", Math.floor(end.toSeconds()));
-    if (hostname) q.where("hostname", hostname);
-  };
+  // Calculate the previous window of the same size
+  const delta = end.toSeconds() - start.toSeconds();
+  const prevStart = start.minus({ seconds: delta });
+  const prevEnd = start;
 
-  const [pageviews, topReferrers, topPathnames] = await Promise.all([
-    // pageviews
-    db
-      .select(
-        db.raw("strftime('%Y-%m-%d', timestamp, 'unixepoch') as date"),
-        db.raw("count(*) as count")
-      )
-      .from("events")
-      .where(filter)
-      .groupByRaw("strftime('%Y-%m-%d', timestamp, 'unixepoch')")
-      .then((rows) => ({
-        labels: rows.map((row: any) => row.date),
-        values: rows.map((row: any) => row.count),
-      })),
-
-    // topReferrers
-    db
-      .with(
-        "top",
-        db
-          .select("referrer", db.raw("count(*) as count"))
-          .from("events")
-          .where(filter)
-          .andWhere("name", "pageview")
-          .groupBy("referrer")
-      )
-      .select()
-      .from("top")
-      .orderBy("count", "desc")
-      .limit(10),
-
-    // topPathnames
-    db
-      .with(
-        "top",
-        db
-          .select("pathname", db.raw("count(*) as count"))
-          .from("events")
-          .where(filter)
-          .andWhere("name", "pageview")
-          .groupBy("pathname")
-      )
-      .select()
-      .from("top")
-      .orderBy("count", "desc")
-      .limit(10),
+  const [
+    pageviews,
+    referrers,
+    pathnames,
+    numSessions,
+    numPageviews,
+    avgSession,
+    prevNumSessions,
+    prevNumPageviews,
+    prevAvgSession,
+  ] = await Promise.all([
+    pageviewsByDay(start, end, hostname),
+    uniqueReferrers(start, end, hostname),
+    uniquePathnames(start, end, hostname),
+    countSessions(start, end, hostname),
+    countPageviews(start, end, hostname),
+    averageSessionDuration(start, end, hostname),
+    countSessions(prevStart, prevEnd, hostname),
+    countPageviews(prevStart, prevEnd, hostname),
+    averageSessionDuration(prevStart, prevEnd, hostname),
   ]);
 
   res.send(
     JSON.stringify({
       pageviews,
-      topReferrers,
-      topPathnames,
+      referrers,
+      pathnames,
+      numSessions,
+      numPageviews,
+      avgSession,
+      prevNumSessions,
+      prevNumPageviews,
+      prevAvgSession,
     })
   );
 }

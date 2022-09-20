@@ -3,11 +3,14 @@ import {
   Flex,
   Grid,
   GridItem,
+  HStack,
   Select,
   Skeleton,
   SkeletonText,
   Stack,
   Stat,
+  StatArrow,
+  StatHelpText,
   StatLabel,
   StatNumber,
   Table,
@@ -27,8 +30,8 @@ import {
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { useBufferedValue } from "hooks/useBufferedValue";
-import { toURL } from "lib/misc";
-import { DateTime } from "luxon";
+import { formatNumber, statPercent, statType, toURL } from "lib/misc";
+import { DateTime, Duration } from "luxon";
 import { ReactElement, ReactNode } from "react";
 import { Chart } from "react-chartjs-2";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
@@ -68,15 +71,14 @@ export default function Page() {
       </GridItem>
 
       <GridItem colSpan={2}>
-        <PageViewChart data={data?.pageviews} />
+        <Card>
+          <DashboardStats data={data} />
+          <PageViewChart data={data?.pageviews} />
+        </Card>
       </GridItem>
 
-      <GridItem>
-        <TopReferrers data={data?.topReferrers} />
-      </GridItem>
-      <GridItem>
-        <TopPathnames data={data?.topPathnames} />
-      </GridItem>
+      <TopReferrers data={data?.referrers} />
+      <TopPathnames data={data?.pathnames} />
     </Grid>
   );
 }
@@ -133,60 +135,95 @@ const DateRangeSelector = () => {
   );
 };
 
-const PageViewChart = ({ data }: { data: any }) => (
-  <Card>
-    <Flex justify="space-between">
-      <Stat>
-        <StatLabel>Total Page Views</StatLabel>
-        {data ? (
-          <StatNumber>
-            {Number(
-              data.values.reduce((a: number, b: number) => a + b, 0)
-            ).toLocaleString()}
-          </StatNumber>
-        ) : (
-          <Skeleton mt={2} h={6} w={24} />
-        )}
-      </Stat>
-    </Flex>
-    {data ? (
-      <Box h="300px">
-        <Chart
-          datasetIdKey="pageviews-by-day"
-          type="line"
-          data={{
-            labels: data.labels,
-            datasets: [
-              {
-                label: "Page Views",
-                data: data.values,
-                spanGaps: true,
-              },
-            ],
-          }}
-          options={{
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                ticks: {
-                  callback: function (val, index) {
-                    return index % 2 === 0
-                      ? DateTime.fromISO(
-                          this.getLabelForValue(Number(val))
-                        ).toFormat("ccc, d LLL")
-                      : "";
-                  },
+const DashboardStat = (props: {
+  title: string;
+  old: number;
+  new: number;
+  loading: boolean;
+  formatter?: (value: any) => string;
+}) => (
+  <Stat>
+    <StatLabel>{props.title}</StatLabel>
+    {props.loading ? (
+      <Stack spacing={2}>
+        <Skeleton mt={2} h={7} w={24} />
+        <Skeleton mt={2} h={4} w={16} />
+      </Stack>
+    ) : (
+      <>
+        <StatNumber>{(props.formatter || formatNumber)(props.new)}</StatNumber>
+        <StatHelpText>
+          <StatArrow type={statType(props.old, props.new)} />
+          {statPercent(props.old, props.new)}
+        </StatHelpText>
+      </>
+    )}
+  </Stat>
+);
+
+const DashboardStats = ({ data }: { data: any }) => (
+  <HStack spacing={4}>
+    <DashboardStat
+      title="Total Page Views"
+      loading={!data}
+      old={data?.prevNumPageviews}
+      new={data?.numPageviews}
+    />
+    <DashboardStat
+      title="Total Sessions"
+      loading={!data}
+      old={data?.prevNumSessions}
+      new={data?.numSessions}
+    />
+    <DashboardStat
+      title="Avg. Session"
+      loading={!data}
+      old={data?.prevAvgSession}
+      new={data?.avgSession}
+      formatter={(x: any) =>
+        x ? Duration.fromMillis(x * 1000).toFormat("m:s") : "--:--"
+      }
+    />
+  </HStack>
+);
+
+const PageViewChart = ({ data }: { data: any }) =>
+  data ? (
+    <Box h="300px">
+      <Chart
+        datasetIdKey="pageviews-by-day"
+        type="line"
+        data={{
+          labels: data.labels,
+          datasets: [
+            {
+              label: "Page Views",
+              data: data.values,
+              spanGaps: true,
+            },
+          ],
+        }}
+        options={{
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              ticks: {
+                callback: function (val, index) {
+                  return index % 2 === 0
+                    ? DateTime.fromISO(
+                        this.getLabelForValue(Number(val))
+                      ).toFormat("ccc, d LLL")
+                    : "";
                 },
               },
             },
-          }}
-        />
-      </Box>
-    ) : (
-      <Skeleton h="300px" />
-    )}
-  </Card>
-);
+          },
+        }}
+      />
+    </Box>
+  ) : (
+    <Skeleton h="300px" />
+  );
 
 const TopReferrers = ({ data }: { data: any }) => (
   <Card>
@@ -202,7 +239,7 @@ const TopReferrers = ({ data }: { data: any }) => (
           {data.map((row: any, index: number) => (
             <Tr key={index}>
               <Td>{row.referrer || "(none)"}</Td>
-              <Td isNumeric>{Number(row.count).toLocaleString()}</Td>
+              <Td isNumeric>{formatNumber(row.count)}</Td>
             </Tr>
           ))}
         </Tbody>
@@ -227,7 +264,7 @@ const TopPathnames = ({ data }: { data: any }) => (
           {data.map((row: any, index: number) => (
             <Tr key={index}>
               <Td>{row.pathname}</Td>
-              <Td isNumeric>{Number(row.count).toLocaleString()}</Td>
+              <Td isNumeric>{formatNumber(row.count)}</Td>
             </Tr>
           ))}
         </Tbody>
