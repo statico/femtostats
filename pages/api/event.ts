@@ -54,7 +54,9 @@ const track = async (req: NextApiRequest) => {
     pathname: getPathname(body.u),
     referrer: getHostname(body.r),
     os: ua.os.name,
+    os_version: ua.os.version,
     browser: ua.browser.name,
+    browser_version: ua.browser.version,
     screen_width: Number(body.sw),
     country,
   });
