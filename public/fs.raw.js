@@ -10,6 +10,7 @@
   var h = w.history;
   var l = w.location;
   var d = w.document;
+  var n = navigator;
 
   // IE isn't supported.
   if (!d.currentScript || typeof URL === "undefined") return;
@@ -114,6 +115,14 @@
       trackEvent("pageview");
     };
   }
+
+  // Track when sessions end
+  d.addEventListener("visibilitychange", function () {
+    if (d.visibilityState === "hidden") {
+      if (n.sendBeacon)
+        n.sendBeacon(host + "/api/end", JSON.stringify({ s: sessionId }));
+    }
+  });
 
   // Done
   w.femtostats = trackEvent;

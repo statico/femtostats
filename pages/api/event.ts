@@ -8,16 +8,14 @@ import { UAParser } from "ua-parser-js";
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "128kb",
+      sizeLimit: "32kb",
     },
   },
 };
 
 export default function (req: NextApiRequest, res: NextApiResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-
   if (req.method === "OPTIONS") return res.status(200).end();
-
   if (req.method !== "POST") return res.status(400).end();
 
   setImmediate(() => {
@@ -57,6 +55,7 @@ const track = async (req: NextApiRequest) => {
 
   await db("events").insert({
     timestamp: now,
+    session_id: body.s,
     name: body.n,
     hostname: getHostname(body.u),
     pathname: getPathname(body.u),
