@@ -9,6 +9,7 @@ services:
     environment:
       DATA_DIR: /data
       PASSWORD: sekrit
+      MAXMIND_GEOLITE2_COUNTRY_URL: https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=YOUR_LICENSE_KEY&suffix=tar.gz
     ports:
       - "127.0.0.1:3000:3000"
     restart: always
