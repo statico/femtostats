@@ -5,6 +5,14 @@ import { singleParam } from "lib/misc";
 import { NextApiRequest, NextApiResponse } from "next";
 import { UAParser } from "ua-parser-js";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "128kb",
+    },
+  },
+};
+
 export default function (req: NextApiRequest, res: NextApiResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
