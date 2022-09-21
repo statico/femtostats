@@ -1,10 +1,12 @@
 # femtostats
 
+**Update: It turns out [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/) does everything I wanted to do except custom events for free, so I'm going to stop working on this for now.**
+
 Femtostats is a super lightweight, tiny, privacy-focused web statistics provider.
 
 [![build status](https://img.shields.io/github/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?style=flat-square)](https://ghcr.io/statico/femtostats)
 
-https://user-images.githubusercontent.com/137158/190950407-550e8361-2ae0-42d8-96e2-6bd8b152e0d2.mp4
+<img width="1437" alt="CleanShot 2022-09-20 at 19 05 11@2x" src="https://user-images.githubusercontent.com/137158/191397904-0e6d58b4-735a-4502-825e-189855638b9d.png">
 
 ## Why?
 
