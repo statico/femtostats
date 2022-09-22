@@ -1,6 +1,5 @@
 import {
   Box,
-  Flex,
   Grid,
   GridItem,
   HStack,
@@ -142,7 +141,7 @@ const DashboardStat = (props: {
   loading: boolean;
   formatter?: (value: any) => string;
 }) => (
-  <Stat>
+  <Stat flex="none">
     <StatLabel>{props.title}</StatLabel>
     {props.loading ? (
       <Stack spacing={2}>
@@ -162,7 +161,7 @@ const DashboardStat = (props: {
 );
 
 const DashboardStats = ({ data }: { data: any }) => (
-  <HStack spacing={4}>
+  <HStack spacing={10}>
     <DashboardStat
       title="Total Page Views"
       loading={!data}
