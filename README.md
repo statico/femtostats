@@ -1,6 +1,6 @@
 # femtostats
 
-**Update: It turns out [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/) does everything I wanted to do except custom events for free, so I'm going to stop working on this for now.**
+**Update: It turns out [Fathom Lite](https://github.com/usefathom/fathom/) does everything I wanted to do except custom events for free, so I'm going to stop working on this for now.**
 
 Femtostats is a super lightweight, tiny, privacy-focused web statistics provider.
 
