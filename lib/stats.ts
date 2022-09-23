@@ -154,6 +154,27 @@ export const topBrowsers = (
     .orderBy("count", "desc")
     .limit(limit);
 
+export const topOperatingSystems = (
+  start: DateTime,
+  end: DateTime,
+  hostname?: string,
+  limit = 10
+) =>
+  db
+    .with(
+      "top",
+      db
+        .select("os", db.raw("count(*) as count"))
+        .from("events")
+        .where(filterEvents(start, end, hostname))
+        .andWhere("name", "pageview")
+        .groupBy("os")
+    )
+    .select()
+    .from("top")
+    .orderBy("count", "desc")
+    .limit(limit);
+
 export const topDeviceTypes = (
   start: DateTime,
   end: DateTime,

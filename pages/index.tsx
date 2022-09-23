@@ -91,6 +91,11 @@ export default function Page() {
       <TopTable title="Pathnames" column="pathname" dataKey="topPathnames" />
       <TopTable title="Countries" column="country" dataKey="topCountries" />
       <TopTable title="Browsers" column="browser" dataKey="topBrowsers" />
+      <TopTable
+        title="Operating Systems"
+        column="os"
+        dataKey="topOperatingSystems"
+      />
       <TopTable title="Device Types" column="device" dataKey="topDeviceTypes" />
     </Grid>
   );
