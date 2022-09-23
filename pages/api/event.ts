@@ -34,6 +34,7 @@ const getHostname = (raw: any) => {
     return null;
   }
 };
+
 const getPathname = (raw: any) => {
   try {
     return new URL(raw).pathname;
@@ -45,7 +46,19 @@ const getPathname = (raw: any) => {
 const track = async (req: NextApiRequest) => {
   assert(typeof req.body === "string");
 
-  const body = JSON.parse(req.body);
+  const {
+    n: name,
+    i: userId,
+    s: sessionId,
+    u: url,
+    r: referrer,
+    w: screenWidth,
+    d: data,
+  } = JSON.parse(req.body);
+
+  const hostname = getHostname(url);
+  const pathname = getPathname(url);
+  const referrerHostname = getHostname(referrer);
   const ua = UAParser(singleParam(req.headers["user-agent"]));
   const ip =
     singleParam(req.headers["x-forwarded-for"]).split(",").pop()?.trim() ||
@@ -55,24 +68,24 @@ const track = async (req: NextApiRequest) => {
 
   await db("events").insert({
     timestamp: now,
-    session_id: body.s,
-    name: body.n,
-    hostname: getHostname(body.u),
-    pathname: getPathname(body.u),
-    referrer: getHostname(body.r),
+    session_id: sessionId,
+    name,
+    hostname,
+    pathname,
+    referrer: referrerHostname,
     os: ua.os.name,
     os_version: ua.os.version,
     browser: ua.browser.name,
     browser_version: ua.browser.version,
-    screen_width: Number(body.sw),
+    screen_width: Number(screenWidth),
     country,
   });
 
-  if (body.s) {
+  if (sessionId) {
     await db("sessions")
       .insert({
-        id: body.s,
-        hostname: getHostname(body.u),
+        id: sessionId,
+        hostname,
         started_at: now,
       })
       .onConflict(["id"])
