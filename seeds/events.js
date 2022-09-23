@@ -80,7 +80,7 @@ exports.seed = async function (knex) {
     const row = {
       timestamp: NOW - Math.floor(rand() * 7776000),
       session_id: randomUUID(),
-      name: "pageview",
+      name: null,
       hostname: `${Math.random() > 0.5 ? "foo" : "bar"}.example.com`,
       pathname: pick(PATHS),
       referrer: pick(REFERRERS),

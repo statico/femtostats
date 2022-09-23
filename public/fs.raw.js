@@ -70,7 +70,7 @@
   // Global event tracking function
   function trackEvent(name, data) {
     var body = {
-      n: name,
+      n: name || null, // null == pageview
       s: sessionId,
       u: l.href,
       r: l.referrer,
@@ -101,18 +101,18 @@
 
   // Track this page view
   setTimeout(function () {
-    trackEvent("pageview");
+    trackEvent();
   }, 1);
 
   // Track any hash changes as page views for SPAs
   w.addEventListener("popstate", function () {
-    trackEvent("pageview");
+    trackEvent();
   });
   if (h && h.pushState) {
     var oldPushState = h.pushState;
     h.pushState = function () {
       oldPushState.apply(this, arguments);
-      trackEvent("pageview");
+      trackEvent();
     };
   }
 
