@@ -70,7 +70,7 @@ export const averageSessionDuration = (
     .whereNotNull("ended_at")
     .then((rows) => Math.round(rows[0].avg));
 
-export const uniqueReferrers = (
+export const topReferrers = (
   start: DateTime,
   end: DateTime,
   hostname?: string,
@@ -91,7 +91,7 @@ export const uniqueReferrers = (
     .orderBy("count", "desc")
     .limit(limit);
 
-export const uniquePathnames = (
+export const topPathnames = (
   start: DateTime,
   end: DateTime,
   hostname?: string,
@@ -109,5 +109,76 @@ export const uniquePathnames = (
     )
     .select()
     .from("top")
+    .orderBy("count", "desc")
+    .limit(limit);
+
+export const topCountries = (
+  start: DateTime,
+  end: DateTime,
+  hostname?: string,
+  limit = 10
+) =>
+  db
+    .with(
+      "top",
+      db
+        .select("country", db.raw("count(*) as count"))
+        .from("events")
+        .where(filterEvents(start, end, hostname))
+        .andWhere("name", "pageview")
+        .groupBy("country")
+    )
+    .select()
+    .from("top")
+    .orderBy("count", "desc")
+    .limit(limit);
+
+export const topBrowsers = (
+  start: DateTime,
+  end: DateTime,
+  hostname?: string,
+  limit = 10
+) =>
+  db
+    .with(
+      "top",
+      db
+        .select("browser", db.raw("count(*) as count"))
+        .from("events")
+        .where(filterEvents(start, end, hostname))
+        .andWhere("name", "pageview")
+        .groupBy("browser")
+    )
+    .select()
+    .from("top")
+    .orderBy("count", "desc")
+    .limit(limit);
+
+export const topDeviceTypes = (
+  start: DateTime,
+  end: DateTime,
+  hostname?: string,
+  limit = 10
+) =>
+  db
+    .with(
+      "devices",
+      db
+        // Close enough maybe? https://stackoverflow.com/a/7354648
+        .select(
+          db.raw(`
+            case
+              when screen_width < 600 then "mobile"
+              when screen_width < 1025 then "tablet"
+              else "desktop"
+            end as device
+          `)
+        )
+        .from("events")
+        .where(filterEvents(start, end, hostname))
+        .andWhere("name", "pageview")
+    )
+    .select("device", db.raw("count(*) as count"))
+    .from("devices")
     .orderBy("count", "desc")
     .limit(limit);

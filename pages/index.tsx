@@ -1,5 +1,8 @@
+import Flag from "react-world-flags";
+import countries from "i18n-iso-countries";
 import {
   Box,
+  Center,
   Grid,
   GridItem,
   HStack,
@@ -15,6 +18,7 @@ import {
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -37,6 +41,8 @@ import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
 
+countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+
 const viewChecker = object({
   hostname: optional(string()),
   start: optional(number()),
@@ -55,10 +61,15 @@ const viewState = atom<ViewState>({
   effects: [syncEffect({ refine: viewChecker })],
 });
 
-export default function Page() {
+export const useDashboardData = () => {
   const view = useRecoilValue(viewState);
   const { data: raw } = useSWR(toURL("/api/stats/dashboard", view));
   const data = useBufferedValue(raw);
+  return data;
+};
+
+export default function Page() {
+  const data = useDashboardData();
 
   return (
     <Grid gap={4} gridTemplate={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
@@ -71,13 +82,16 @@ export default function Page() {
 
       <GridItem colSpan={2}>
         <Card>
-          <DashboardStats data={data} />
-          <PageViewChart data={data?.pageviews} />
+          <DashboardStats />
+          <PageViewChart />
         </Card>
       </GridItem>
 
-      <TopReferrers data={data?.referrers} />
-      <TopPathnames data={data?.pathnames} />
+      <TopTable title="Referrers" column="referrer" dataKey="topReferrers" />
+      <TopTable title="Pathnames" column="pathname" dataKey="topPathnames" />
+      <TopTable title="Countries" column="country" dataKey="topCountries" />
+      <TopTable title="Browsers" column="browser" dataKey="topBrowsers" />
+      <TopTable title="Device Types" column="device" dataKey="topDeviceTypes" />
     </Grid>
   );
 }
@@ -160,34 +174,38 @@ const DashboardStat = (props: {
   </Stat>
 );
 
-const DashboardStats = ({ data }: { data: any }) => (
-  <HStack spacing={10}>
-    <DashboardStat
-      title="Total Page Views"
-      loading={!data}
-      old={data?.prevNumPageviews}
-      new={data?.numPageviews}
-    />
-    <DashboardStat
-      title="Total Sessions"
-      loading={!data}
-      old={data?.prevNumSessions}
-      new={data?.numSessions}
-    />
-    <DashboardStat
-      title="Avg. Session"
-      loading={!data}
-      old={data?.prevAvgSession}
-      new={data?.avgSession}
-      formatter={(x: any) =>
-        x ? Duration.fromMillis(x * 1000).toFormat("m:s") : "--:--"
-      }
-    />
-  </HStack>
-);
+const DashboardStats = () => {
+  const data = useDashboardData();
+  return (
+    <HStack spacing={10}>
+      <DashboardStat
+        title="Total Page Views"
+        loading={!data}
+        old={data?.countPageviewsPrev}
+        new={data?.countPageviews}
+      />
+      <DashboardStat
+        title="Total Sessions"
+        loading={!data}
+        old={data?.countSessionsPrev}
+        new={data?.countSessions}
+      />
+      <DashboardStat
+        title="Avg. Session"
+        loading={!data}
+        old={data?.averageSessionDurationPrev}
+        new={data?.averageSessionDuration}
+        formatter={(x: any) =>
+          x ? Duration.fromMillis(x * 1000).toFormat("m:s") : "--:--"
+        }
+      />
+    </HStack>
+  );
+};
 
-const PageViewChart = ({ data }: { data: any }) =>
-  data ? (
+const PageViewChart = () => {
+  const data = useDashboardData()?.pageviewsByDay;
+  return data ? (
     <Box h="300px">
       <Chart
         datasetIdKey="pageviews-by-day"
@@ -223,53 +241,62 @@ const PageViewChart = ({ data }: { data: any }) =>
   ) : (
     <Skeleton h="300px" />
   );
+};
 
-const TopReferrers = ({ data }: { data: any }) => (
-  <Card>
-    {data ? (
-      <Table size="sm">
-        <Thead>
-          <Tr>
-            <Th>Referrer</Th>
-            <Th isNumeric>Page Views</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {data.map((row: any, index: number) => (
-            <Tr key={index}>
-              <Td>{row.referrer || "(none)"}</Td>
-              <Td isNumeric>{formatNumber(row.count)}</Td>
+const TopTable = ({
+  title,
+  column,
+  dataKey,
+}: {
+  title: string;
+  column: string;
+  dataKey: string;
+}) => {
+  const data = useDashboardData()?.[dataKey];
+  return (
+    <Card>
+      {data ? (
+        <Table size="sm">
+          <Thead>
+            <Tr>
+              <Th>{title}</Th>
+              <Th isNumeric>Page Views</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    ) : (
-      <SkeletonText spacing={4} noOfLines={10} />
-    )}
-  </Card>
-);
-
-const TopPathnames = ({ data }: { data: any }) => (
-  <Card>
-    {data ? (
-      <Table size="sm">
-        <Thead>
-          <Tr>
-            <Th>Pathname</Th>
-            <Th isNumeric>Page Views</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {data.map((row: any, index: number) => (
-            <Tr key={index}>
-              <Td>{row.pathname}</Td>
-              <Td isNumeric>{formatNumber(row.count)}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    ) : (
-      <SkeletonText spacing={4} noOfLines={10} />
-    )}
-  </Card>
-);
+          </Thead>
+          <Tbody>
+            {data.map((row: any, index: number) => (
+              <Tr key={index}>
+                <Td>
+                  {column === "country" ? (
+                    <HStack>
+                      <Flag
+                        code={row[column]}
+                        height="20px"
+                        width="20px"
+                        fallback={
+                          <Center h="16px" w="20px" bg="black" color="white">
+                            ?
+                          </Center>
+                        }
+                      />
+                      <Text>
+                        {countries.getName(row[column], "en", {
+                          select: "alias",
+                        }) || "(unknown)"}
+                      </Text>
+                    </HStack>
+                  ) : (
+                    row[column] || "(none)"
+                  )}
+                </Td>
+                <Td isNumeric>{formatNumber(row.count)}</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      ) : (
+        <SkeletonText spacing={4} noOfLines={10} />
+      )}
+    </Card>
+  );
+};

@@ -6,8 +6,9 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 
 <img width="1437" alt="CleanShot 2022-09-20 at 19 05 11@2x" src="https://user-images.githubusercontent.com/137158/191397904-0e6d58b4-735a-4502-825e-189855638b9d.png">
 
-## What does it do?
+## Why?
 
+- Easily self-hostable
 - Easy setup with a single `<script>` tag
 - Simple pageview and session tracking
 - Arbitrary client-side event tracking
@@ -18,7 +19,6 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 - Collection of client-side performance stats and screen width
 - Geographic tracking with a free Maxmind account signup
 - Optional cookieless operation to abide by privacy laws
-- Dockerizable and trivially self-hostable or on [Fly.io](https://fly.io)
 
 ## Why not use ........?
 
@@ -68,3 +68,4 @@ This project uses [Next.js](https://nextjs.org/), [React](https://reactjs.org/),
 - Use the [better-sqlite3](https://www.npmjs.com/package/better-sqlite3) driver
 - Compact/vacuum the database
 - Support other databases, maybe, I dunno
+- Support UTM campaigns

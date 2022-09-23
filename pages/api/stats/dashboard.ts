@@ -1,12 +1,5 @@
 import { singleParam } from "lib/misc";
-import {
-  averageSessionDuration,
-  countPageviews,
-  countSessions,
-  pageviewsByDay,
-  uniquePathnames,
-  uniqueReferrers,
-} from "lib/stats";
+import * as stats from "lib/stats";
 import { DateTime } from "luxon";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -26,38 +19,47 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   const prevEnd = start;
 
   const [
-    pageviews,
-    referrers,
-    pathnames,
-    numSessions,
-    numPageviews,
-    avgSession,
-    prevNumSessions,
-    prevNumPageviews,
-    prevAvgSession,
+    pageviewsByDay,
+    topReferrers,
+    topPathnames,
+    topCountries,
+    topBrowsers,
+    topDeviceTypes,
+    countPageviews,
+    countSessions,
+    averageSessionDuration,
+    countPageviewsPrev,
+    countSessionsPrev,
+    averageSessionDurationPrev,
   ] = await Promise.all([
-    pageviewsByDay(start, end, hostname),
-    uniqueReferrers(start, end, hostname),
-    uniquePathnames(start, end, hostname),
-    countSessions(start, end, hostname),
-    countPageviews(start, end, hostname),
-    averageSessionDuration(start, end, hostname),
-    countSessions(prevStart, prevEnd, hostname),
-    countPageviews(prevStart, prevEnd, hostname),
-    averageSessionDuration(prevStart, prevEnd, hostname),
+    stats.pageviewsByDay(start, end, hostname),
+    stats.topReferrers(start, end, hostname),
+    stats.topPathnames(start, end, hostname),
+    stats.topCountries(start, end, hostname),
+    stats.topBrowsers(start, end, hostname),
+    stats.topDeviceTypes(start, end, hostname),
+    stats.countPageviews(start, end, hostname),
+    stats.countSessions(start, end, hostname),
+    stats.averageSessionDuration(start, end, hostname),
+    stats.countPageviews(prevStart, prevEnd, hostname),
+    stats.countSessions(prevStart, prevEnd, hostname),
+    stats.averageSessionDuration(prevStart, prevEnd, hostname),
   ]);
 
   res.send(
     JSON.stringify({
-      pageviews,
-      referrers,
-      pathnames,
-      numSessions,
-      numPageviews,
-      avgSession,
-      prevNumSessions,
-      prevNumPageviews,
-      prevAvgSession,
+      pageviewsByDay,
+      topReferrers,
+      topPathnames,
+      topCountries,
+      topBrowsers,
+      topDeviceTypes,
+      countPageviews,
+      countSessions,
+      averageSessionDuration,
+      countPageviewsPrev,
+      countSessionsPrev,
+      averageSessionDurationPrev,
     })
   );
 }
