@@ -168,9 +168,9 @@ export const topDeviceTypes = (
         .select(
           db.raw(`
             case
-              when screen_width < 600 then "mobile"
-              when screen_width < 1025 then "tablet"
-              else "desktop"
+              when screen_width < 600 then "Mobile"
+              when screen_width < 1025 then "Tablet"
+              else "Desktop"
             end as device
           `)
         )
@@ -180,5 +180,6 @@ export const topDeviceTypes = (
     )
     .select("device", db.raw("count(*) as count"))
     .from("devices")
+    .groupBy("device")
     .orderBy("count", "desc")
     .limit(limit);
