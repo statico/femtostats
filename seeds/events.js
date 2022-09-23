@@ -57,7 +57,7 @@ exports.seed = async function (knex) {
   ];
 
   // No preference — I'm simply picking countries where I currently have coworkers
-  const COUNTRIES = ["US", "CA", "UK", "IN", "BR", "UY", "GB", "PL"];
+  const COUNTRIES = ["US", "CA", "IN", "BR", "UY", "GB", "PL"];
 
   const REFERRERS = [null, "www.facebook.com", "www.reddit.com", "twitter.com"];
 
