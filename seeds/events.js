@@ -1,6 +1,7 @@
 const { randomUUID } = require("crypto");
 const { DateTime } = require("luxon");
 const UAParser = require("ua-parser-js");
+const random = require("random");
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -62,6 +63,7 @@ exports.seed = async function (knex) {
 
   const NOW = Math.floor(Date.now() / 1000);
 
+  const rand = random.exponential();
   const rows = [];
   const extra = [];
   for (let i = 0; i < 1e5; i++) {
@@ -76,7 +78,7 @@ exports.seed = async function (knex) {
     const ua = UAParser(userAgent);
 
     const row = {
-      timestamp: NOW - Math.floor(Math.random() * 7776000),
+      timestamp: NOW - Math.floor(rand() * 7776000),
       session_id: randomUUID(),
       name: "pageview",
       hostname: `${Math.random() > 0.5 ? "foo" : "bar"}.example.com`,
