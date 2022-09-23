@@ -1,4 +1,8 @@
-exports.up = (knex) => {
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = async (knex) => {
   return knex.schema.createTable("events", (t) => {
     t.integer("timestamp").index();
     t.text("name").notNullable().index();
@@ -11,6 +15,10 @@ exports.up = (knex) => {
   });
 };
 
-exports.down = (knex) => {
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = async (knex) => {
   return knex.schema.dropTable("events");
 };

@@ -3,10 +3,9 @@
  * @returns { Promise<void> }
  */
 exports.up = async (knex) => {
-  await knex.schema.alterTable("events", (t) => {
-    t.setNullable("name");
+  await knex.schema.alterTable("sessions", (t) => {
+    t.text("user_id").index();
   });
-  await knex("events").update({ name: null }).where("name", "pageview");
 };
 
 /**
@@ -14,8 +13,7 @@ exports.up = async (knex) => {
  * @returns { Promise<void> }
  */
 exports.down = async (knex) => {
-  await knex("events").update({ name: "pageview" }).whereNull("name");
   await knex.schema.alterTable("events", (t) => {
-    t.dropNullable("name");
+    t.dropColumn("user_id");
   });
 };

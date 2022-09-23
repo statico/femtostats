@@ -85,6 +85,7 @@ const track = async (req: NextApiRequest) => {
     await db("sessions")
       .insert({
         id: sessionId,
+        user_id: userId,
         hostname,
         started_at: now,
       })
