@@ -69,8 +69,6 @@ export const useDashboardData = () => {
 };
 
 export default function Page() {
-  const data = useDashboardData();
-
   return (
     <Grid gap={4} gridTemplate={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
       <GridItem>
@@ -210,6 +208,7 @@ const DashboardStats = () => {
 
 const PageViewChart = () => {
   const data = useDashboardData()?.pageviewsByDay;
+  const dashed = [6, 6];
   return data ? (
     <Box h="300px">
       <Chart
@@ -222,6 +221,12 @@ const PageViewChart = () => {
               label: "Page Views",
               data: data.values,
               spanGaps: true,
+              segment: {
+                borderDash: (ctx) =>
+                  ctx.p1DataIndex === data.values.length - 1
+                    ? dashed
+                    : undefined,
+              },
             },
           ],
         }}
