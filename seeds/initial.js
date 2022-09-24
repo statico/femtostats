@@ -1,5 +1,4 @@
-const { randomUUID } = require("crypto");
-const { DateTime } = require("luxon");
+const { randomBytes } = require("crypto");
 const UAParser = require("ua-parser-js");
 const random = require("random");
 
@@ -8,8 +7,24 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 exports.seed = async function (knex) {
   await knex("events").del();
   await knex("sessions").del();
+  await knex("properties").del();
 
-  const PATHS = [
+  const PROPERTIES = [
+    {
+      id: 1,
+      name: "Site A",
+      hostnames: "example.com",
+      token: "abcdef12345",
+    },
+    {
+      id: 2,
+      name: "Site B",
+      hostnames: "example2.com",
+      token: "zzxxyy56789",
+    },
+  ];
+
+  const PATHNAMES = [
     "/apple",
     "/banana",
     "/cherry",
@@ -61,12 +76,18 @@ exports.seed = async function (knex) {
 
   const REFERRERS = [null, "www.facebook.com", "www.reddit.com", "twitter.com"];
 
-  const NOW = Math.floor(Date.now() / 1000);
+  const NOW = Date.now() / 1000;
 
   const rand = random.exponential();
-  const rows = [];
-  const extra = [];
+  const events = [];
+  const sessions = [];
   for (let i = 0; i < 1e5; i++) {
+    const property = pick(PROPERTIES);
+    const hostname = property.hostnames.split(",")[0];
+    const userId = randomBytes(8).toString("hex");
+    const sessionId = randomBytes(8).toString("hex");
+    const country = pick(COUNTRIES);
+
     const info = pick(AGENTS);
     let userAgent, width;
     if (Array.isArray(info)) {
@@ -77,47 +98,54 @@ exports.seed = async function (knex) {
     }
     const ua = UAParser(userAgent);
 
-    const row = {
-      timestamp: NOW - Math.floor(rand() * 7776000),
-      session_id: randomUUID(),
-      name: null,
-      hostname: `${Math.random() > 0.5 ? "foo" : "bar"}.example.com`,
-      pathname: pick(PATHS),
-      referrer: pick(REFERRERS),
-      country: pick(COUNTRIES),
-      os: ua.os.name,
-      os_version: ua.os.version,
-      browser: ua.browser.name,
-      browser_version: ua.browser.version,
-      screen_width: width,
-    };
-    rows.push(row);
+    const start = NOW - rand() * 7776000;
+    let timestamp = start;
+    let referrer = pick(REFERRERS);
+    let pathname = null;
+    const eventCount = rand() * 4;
+    for (let j = 0; j < eventCount; j++) {
+      if (pathname) {
+        referrer = "https://" + hostname + pathname;
+      }
+      pathname = pick(PATHNAMES);
 
-    if (Math.random() < 0.001) {
-      extra.push({
-        ...row,
-        name: "buy-now-click",
-      });
+      const row = {
+        timestamp: Math.floor(timestamp),
+        property_id: property.id,
+        session_id: sessionId,
+        name: null,
+        hostname,
+        pathname,
+        referrer,
+        country,
+        os: ua.os.name,
+        os_version: ua.os.version,
+        browser: ua.browser.name,
+        browser_version: ua.browser.version,
+        screen_width: width,
+      };
+      events.push(row);
+
+      if (rand() < 0.001) {
+        events.push({
+          ...row,
+          name: "buy-now-click",
+        });
+      }
+
+      timestamp += Math.random() * 90 + 5;
     }
+
+    sessions.push({
+      id: sessionId,
+      property_id: property.id,
+      user_id: userId,
+      started_at: Math.floor(start),
+      ended_at: timestamp,
+    });
   }
 
-  await knex.batchInsert("events", rows, 100);
-  await knex.batchInsert("events", extra, 100);
-  await knex.batchInsert(
-    "sessions",
-    rows.map((row) => ({
-      id: row.session_id,
-      hostname: row.hostname,
-      started_at: row.timestamp,
-      ended_at:
-        Math.random() > 0.5
-          ? null
-          : Math.floor(
-              DateTime.fromSeconds(row.timestamp).plus({
-                minutes: Math.random() * 5,
-              }) / 1000
-            ),
-    })),
-    100
-  );
+  await knex.batchInsert("properties", PROPERTIES, 100);
+  await knex.batchInsert("events", events, 100);
+  await knex.batchInsert("sessions", sessions, 100);
 };
