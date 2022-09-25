@@ -19,6 +19,7 @@
 
   var host = new URL(script.src).origin;
   var token = script.getAttribute("data-token");
+  var useCookies = script.getAttribute("data-cookies") !== "false";
 
   // Pick 64 bits of randomness for user IDs and session IDs.
   function generateID() {
@@ -51,11 +52,6 @@
       return ret;
     }
   }
-
-  // Allow Femtostats to operate in cookieless mode for easier compliance with
-  // local laws. A session won't be as accurate, but what can you do? script.js.tsx
-  // will change this to false if NO_COOKIES is set.
-  var useCookies = true;
 
   // Create or retrieve a session ID
   var sessionId = null,

@@ -49,7 +49,7 @@ To record which country the user has originated from, you need a geoip database.
 
 ### Disabling Cookies
 
-By default, Femtostats stores a simple cookie on the client to keep track of user sessions. You can disable the use of cookies entirely by setting the env var `NO_COOKIES=1`. Sessions will still show in the dashboard, but without cookies, the definition of a session changes from "a user's browser session" to "a single page view."
+By default, Femtostats stores a simple cookie on the client to count unique users and user sessions. You can disable the use of cookies entirely by adding `data-cookies="false"` to the `<script>` tag you embed on your site. Sessions will still show in the dashboard, but without cookies, the definition of a session changes from "a user's browser session" to "a single page view."
 
 ## Development
 

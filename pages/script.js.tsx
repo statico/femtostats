@@ -4,13 +4,11 @@ import UglifyJS from "uglify-js";
 
 export default function Page() {}
 
+// This generates script.js as build time so that it's served as a static asset
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   let source = readFileSync("public/script.raw.js", "utf8");
 
-  if (process.env.NO_COOKIES) {
-    source = source.replace(/useCookies = true/, "useCookies = false");
-  }
-
+  // Make the bundle as small as possible
   const minified = UglifyJS.minify(source, {
     ie8: true,
     webkit: true,

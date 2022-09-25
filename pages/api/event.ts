@@ -9,16 +9,22 @@ import { UAParser } from "ua-parser-js";
 export const config = {
   api: {
     bodyParser: {
+      // There's no need for event data to be bigger than this.
       sizeLimit: "32kb",
     },
   },
 };
 
 export default function (req: NextApiRequest, res: NextApiResponse) {
+  // Allow requests from anywhere
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  // POST requests only, please
   if (req.method !== "POST") return res.status(400).end();
 
+  // Defer all computation outside of this execution cycle. Respond to the user
+  // as fast as possible.
   setImmediate(() => {
     track(req)
       .then(() => {})
@@ -45,6 +51,7 @@ const getPathname = (raw: any) => {
 };
 
 const track = async (req: NextApiRequest) => {
+  // Make sure Next.js parsed the body as we expected
   assert(typeof req.body === "string");
 
   const {
@@ -58,12 +65,14 @@ const track = async (req: NextApiRequest) => {
     d: data, // TODO
   } = JSON.parse(req.body);
 
+  // Get the site using the token
   const site = await db.first().from("sites").where("token", token);
   if (!site) {
     console.error(`Unknown site token: ${JSON.stringify(token)}`);
     return;
   }
 
+  // Make sure the host recording the event is allowed
   const hostname = getHostname(url);
   let isHostnameAllowed = false;
   for (const pattern of site.hostnames.split(",")) {
