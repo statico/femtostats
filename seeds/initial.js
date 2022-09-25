@@ -27,6 +27,7 @@ exports.seed = async function (knex) {
   ];
 
   const PATHNAMES = [
+    "/",
     "/apple",
     "/banana",
     "/cherry",
@@ -38,7 +39,6 @@ exports.seed = async function (knex) {
     "/ice-cream",
     "/about-us",
     "/contact",
-    "/",
   ];
 
   const AGENTS = [
