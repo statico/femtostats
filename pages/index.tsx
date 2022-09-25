@@ -21,6 +21,7 @@ import {
   Th,
   Thead,
   Tr,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
@@ -277,10 +278,13 @@ const TopTable = ({
   column: string;
   dataKey: string;
 }) => {
-  const data = useDashboardData()?.[dataKey];
+  const data = useDashboardData();
+  const rows = data?.[dataKey];
+  const total = data?.countPageviews;
+  const bg = useColorModeValue("gray.200", "gray.800");
   return (
     <Card>
-      {data ? (
+      {rows ? (
         <Table size="sm">
           <Thead>
             <Tr>
@@ -289,30 +293,32 @@ const TopTable = ({
             </Tr>
           </Thead>
           <Tbody>
-            {data.map((row: any, index: number) => (
+            {rows.map((row: any, index: number) => (
               <Tr key={index}>
-                <Td>
-                  {column === "country" ? (
-                    <HStack>
-                      <Flag
-                        code={row[column]}
-                        height="20px"
-                        width="20px"
-                        fallback={
-                          <Center h="16px" w="20px" bg="black" color="white">
-                            ?
-                          </Center>
-                        }
-                      />
-                      <Text>
-                        {countries.getName(row[column], "en", {
-                          select: "alias",
-                        }) || "(unknown)"}
-                      </Text>
-                    </HStack>
-                  ) : (
-                    row[column] || "(none)"
-                  )}
+                <Td
+                  position="relative"
+                  width="66%"
+                  sx={{
+                    _after: {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      left: 0,
+                      width: `calc(${(row.count / total) * 100}% + 0.5rem)`,
+                      bg,
+                      opacity: 0.5,
+                      zIndex: 0,
+                    },
+                  }}
+                >
+                  <Box zIndex={1} position="relative">
+                    {column === "country" ? (
+                      <Country value={row.country} count={row.count} />
+                    ) : (
+                      row[column] || "(none)"
+                    )}
+                  </Box>
                 </Td>
                 <Td isNumeric>{formatNumber(row.count)}</Td>
               </Tr>
@@ -323,5 +329,27 @@ const TopTable = ({
         <SkeletonText spacing={4} noOfLines={10} />
       )}
     </Card>
+  );
+};
+
+const Country = ({ value, count }: { value: string | null; count: number }) => {
+  const name =
+    countries.getName(value || "", "en", { select: "alias" }) ||
+    value ||
+    "(unknown)";
+  return (
+    <HStack>
+      <Flag
+        code={value ?? ""}
+        height="20px"
+        width="20px"
+        fallback={
+          <Center h="16px" w="20px" bg="black" color="white">
+            ?
+          </Center>
+        }
+      />
+      <Text>{name}</Text>
+    </HStack>
   );
 };
