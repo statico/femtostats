@@ -128,7 +128,7 @@ const SiteSelector = () => {
   return (
     <Select
       maxW="xs"
-      defaultValue={data?.sites?.[0]?.id}
+      value={view.siteId}
       onChange={(e) => {
         const siteId = Number(e.target.value) || undefined;
         setView({ ...view, siteId });
