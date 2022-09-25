@@ -1,8 +1,5 @@
 const { randomBytes } = require("crypto");
 const UAParser = require("ua-parser-js");
-const random = require("random");
-
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 //
 // Populate the database with two sites and some random growing data for the
@@ -77,13 +74,15 @@ exports.seed = async function (knex) {
   ];
 
   // No preference — I'm simply picking countries where I currently have coworkers
-  const COUNTRIES = ["US", "CA", "IN", "BR", "UY", "GB", "PL"];
+  const COUNTRIES = ["US", "CA", "IN", "UA", "BR", "UY", "GB", "PL"];
 
   const REFERRERS = [null, "www.facebook.com", "www.reddit.com", "twitter.com"];
 
   const NOW = Date.now() / 1000;
 
-  const rand = random.exponential();
+  const rand = () => Math.pow(Math.random(), 2);
+  const pick = (arr) => arr[Math.floor(rand() * arr.length)];
+
   const events = [];
   const sessions = [];
   for (let i = 0; i < 1e4; i++) {
@@ -91,7 +90,6 @@ exports.seed = async function (knex) {
     const hostname = site.hostnames.split(",")[0];
     const userId = randomBytes(8).toString("hex");
     const sessionId = randomBytes(8).toString("hex");
-    const country = pick(COUNTRIES);
 
     const info = pick(AGENTS);
     let userAgent, width;
@@ -118,7 +116,7 @@ exports.seed = async function (knex) {
         hostname,
         pathname,
         referrer: pick(REFERRERS),
-        country,
+        country: pick(COUNTRIES),
         os: ua.os.name,
         os_version: ua.os.version,
         browser: ua.browser.name,
