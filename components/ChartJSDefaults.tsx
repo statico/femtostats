@@ -4,7 +4,7 @@ import { Chart as ChartJS } from "chart.js";
 export const ChartJSDefaults = () => {
   const [black, white, darkTeal, lightTeal, darkGray, lightGray] = useToken(
     "colors",
-    ["black", "white", "teal.900", "teal.400", "gray.800", "gray.300"]
+    ["black", "white", "teal.500", "teal.400", "gray.800", "gray.300"]
   );
 
   const text = useColorModeValue(black, white);

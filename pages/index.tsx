@@ -118,11 +118,14 @@ Page.getLayout = (page: ReactElement) => {
   return <DefaultLayout title="Dashboard">{page}</DefaultLayout>;
 };
 
-const Card = ({ children }: { children: ReactNode }) => (
-  <Stack spacing={4} borderRadius="lg" bg="gray.700" p={4}>
-    {children}
-  </Stack>
-);
+const Card = ({ children }: { children: ReactNode }) => {
+  const bg = useColorModeValue("gray.100", "gray.700");
+  return (
+    <Stack spacing={4} borderRadius="lg" bg={bg} p={4}>
+      {children}
+    </Stack>
+  );
+};
 
 const SiteSelector = () => {
   const [view, setView] = useRecoilState(viewState);
@@ -281,7 +284,7 @@ const TopTable = ({
   const data = useDashboardData();
   const rows = data?.[dataKey];
   const total = data?.countPageviews;
-  const bg = useColorModeValue("gray.200", "gray.800");
+  const bg = useColorModeValue("gray.300", "gray.800");
   return (
     <Card>
       {rows ? (
@@ -305,7 +308,7 @@ const TopTable = ({
                       top: 0,
                       bottom: 0,
                       left: 0,
-                      width: `calc(${(row.count / total) * 100}% + 0.5rem)`,
+                      width: `calc(${(row.count / total) * 100}% + 0.1rem)`,
                       bg,
                       opacity: 0.5,
                       zIndex: 0,
