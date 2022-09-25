@@ -25,7 +25,7 @@ export default function (req: NextApiRequest, res: NextApiResponse) {
       .catch((err: any) => console.error(`Error: ${err}`));
   });
 
-  res.setHeader("Content-Type", "image/text").send("");
+  res.setHeader("Content-Type", "text/plain").send("");
 }
 
 const getHostname = (raw: any) => {
