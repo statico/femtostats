@@ -53,7 +53,7 @@
   }
 
   // Allow Femtostats to operate in cookieless mode for easier compliance with
-  // local laws. A session won't be as accurate, but what can you do? fs.js.tsx
+  // local laws. A session won't be as accurate, but what can you do? script.js.tsx
   // will change this to false if NO_COOKIES is set.
   var useCookies = true;
 

@@ -5,7 +5,7 @@ import UglifyJS from "uglify-js";
 export default function Page() {}
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-  let source = readFileSync("public/fs.raw.js", "utf8");
+  let source = readFileSync("public/script.raw.js", "utf8");
 
   if (process.env.NO_COOKIES) {
     source = source.replace(/useCookies = true/, "useCookies = false");

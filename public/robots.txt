@@ -1,4 +1,4 @@
 User-agent: *
-Allow: /fs.js
-Allow: /fs.raw.js
+Allow: /script.js
+Allow: /script.raw.js
 Disallow: /

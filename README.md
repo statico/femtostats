@@ -35,7 +35,7 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
    - Check out the `docker-compose.yml` file in this repo as an example.
    - See below instructions on creating a Maxmind account to resolve geographic location at the country level.
    - Specify a `PASSWORD` env var to protect your dashboard behind a password (the username is `admin`).
-1. Include the tag `<script defer src="https://your-femtostats.com/fs.js"></script>` on the pages you want to track.
+1. Include the tag `<script defer src="https://your-femtostats.com/script.js"></script>` on the pages you want to track.
 1. For custom event tracking, call `window.femtostats('event name')`
 
 ### Enabling Country Resolution
