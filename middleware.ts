@@ -1,3 +1,4 @@
+import { singleParam } from "lib/misc";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -8,6 +9,10 @@ export function middleware(req: NextRequest) {
   const secret = process.env.PASSWORD;
   if (!secret) return NextResponse.next();
 
+  const ip =
+    singleParam(req.headers.get("x-forwarded-for")).split(",").pop()?.trim() ||
+    req.ip;
+
   try {
     const auth = req.headers.get("authorization") || "";
 
@@ -16,10 +21,10 @@ export function middleware(req: NextRequest) {
     const [username, password] = atob(auth.substring(5)).split(":");
 
     if (username !== HARDCODED_USERNAME || password !== secret)
-      throw new Error("Invalid credentials");
+      throw new Error(`Invalid credentials from ${ip}`);
     return NextResponse.next();
   } catch (err) {
-    console.log(`Authentication error: ${err}`);
+    console.log(`Authentication error: ${err} from ${ip}`);
     return new NextResponse(null, {
       status: 401,
       headers: {

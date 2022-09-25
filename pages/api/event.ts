@@ -83,7 +83,11 @@ const track = async (req: NextApiRequest) => {
     }
   }
   if (!isHostnameAllowed) {
-    console.error(`Hostname ${JSON.stringify(hostname)} not allowed by site`);
+    console.error(
+      `Hostname ${JSON.stringify(hostname)} does not match site ${
+        site.id
+      }'s hostnames ${JSON.stringify(site.hostname)}`
+    );
     return;
   }
 
