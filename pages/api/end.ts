@@ -20,7 +20,7 @@ export default function (req: NextApiRequest, res: NextApiResponse) {
 
   setImmediate(async () => {
     await db("sessions")
-      .update({ ended_at: Math.floor(Date.now() / 1000) })
+      .update({ last_activity_at: Math.floor(Date.now() / 1000) })
       .where("id", body.s);
   });
 

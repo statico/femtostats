@@ -123,8 +123,9 @@ const track = async (req: NextApiRequest) => {
         site_id: site.id,
         user_id: userId,
         started_at: now,
+        last_activity_at: now,
       })
       .onConflict(["id"])
-      .merge();
+      .merge(["last_activity_at"]);
   }
 };

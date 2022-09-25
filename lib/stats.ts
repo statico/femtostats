@@ -60,16 +60,40 @@ export const countSessions = (
     .where(filterSessions(start, end, siteId))
     .then((rows) => rows[0]["count(*)"]);
 
+export const countUsers = (start: DateTime, end: DateTime, siteId?: string) =>
+  db
+    .count<any>()
+    .distinct("user_id")
+    .from("sessions")
+    .where(filterSessions(start, end, siteId))
+    .then((rows) => rows[0]["count(*)"]);
+
+export const countLiveUsers = (
+  start: DateTime,
+  end: DateTime,
+  siteId?: string
+) =>
+  db
+    .count<any>()
+    .from("sessions")
+    .where("site_id", siteId)
+    .andWhere(
+      "last_activity_at",
+      ">=",
+      Math.floor(DateTime.now().minus({ minutes: 5 }).toSeconds())
+    )
+    .then((rows) => rows[0]["count(*)"]);
+
 export const averageSessionDuration = (
   start: DateTime,
   end: DateTime,
   siteId?: string
 ) =>
   db
-    .select(db.raw("avg(ended_at - started_at) as avg"))
+    .select(db.raw("avg(last_activity_at - started_at) as avg"))
     .from("sessions")
     .where(filterSessions(start, end, siteId))
-    .whereNotNull("ended_at")
+    .whereNotNull("last_activity_at")
     .then((rows) => Math.round(rows[0].avg));
 
 export const topByColumn = (

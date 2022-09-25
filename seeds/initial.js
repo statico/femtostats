@@ -101,7 +101,7 @@ exports.seed = async function (knex) {
     }
     const ua = UAParser(userAgent);
 
-    const start = NOW - rand() * 7776000;
+    const start = Math.floor(NOW - rand() * 7776000);
     let timestamp = start;
     let pathname = null;
     const eventCount = rand() * 4;
@@ -109,7 +109,7 @@ exports.seed = async function (knex) {
       pathname = pick(PATHNAMES);
 
       const row = {
-        timestamp: Math.floor(timestamp),
+        timestamp,
         site_id: site.id,
         session_id: sessionId,
         name: null,
@@ -132,15 +132,15 @@ exports.seed = async function (knex) {
         });
       }
 
-      timestamp += Math.random() * 90 + 5;
+      timestamp += Math.floor(Math.random() * 90 + 5);
     }
 
     sessions.push({
       id: sessionId,
       site_id: site.id,
       user_id: userId,
-      started_at: Math.floor(start),
-      ended_at: timestamp,
+      started_at: start,
+      last_activity_at: timestamp,
     });
   }
 

@@ -32,7 +32,7 @@ exports.up = async (knex) => {
       t.integer("site_id").references("site.id").index();
       t.text("user_id");
       t.integer("started_at").index();
-      t.integer("ended_at").index();
+      t.integer("last_activity_at").index();
     });
 
   await knex.into("sites").insert({

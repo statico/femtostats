@@ -16,6 +16,7 @@ import {
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -30,7 +31,7 @@ import { formatNumber, statPercent, statType, toURL } from "lib/misc";
 import { DateTime, Duration } from "luxon";
 import { ReactElement, ReactNode } from "react";
 import { Chart } from "react-chartjs-2";
-import { MdSettings } from "react-icons/md";
+import { MdPerson, MdSettings } from "react-icons/md";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
@@ -56,7 +57,9 @@ const viewState = atom<ViewState>({
 
 const useDashboardData = () => {
   const view = useRecoilValue(viewState);
-  const { data: raw } = useSWR(toURL("/api/stats/dashboard", view));
+  const { data: raw } = useSWR(toURL("/api/stats/dashboard", view), {
+    refreshInterval: 60000,
+  });
   const data = useBufferedValue(raw);
   return data;
 };
@@ -167,10 +170,11 @@ const DateRangeSelector = () => {
 
 const DashboardStat = (props: {
   title: string;
-  old: number;
+  old?: number;
   new: number;
   loading: boolean;
   formatter?: (value: any) => string;
+  icon?: ReactNode;
 }) => (
   <Stat flex="none">
     <StatLabel>{props.title}</StatLabel>
@@ -183,8 +187,16 @@ const DashboardStat = (props: {
       <>
         <StatNumber>{(props.formatter || formatNumber)(props.new)}</StatNumber>
         <StatHelpText>
-          <StatArrow type={statType(props.old, props.new)} />
-          {statPercent(props.old, props.new)}
+          {props.old ? (
+            <>
+              <StatArrow type={statType(props.old, props.new)} />
+              {statPercent(props.old, props.new)}
+            </>
+          ) : props.icon ? (
+            <Text color="green.300">{props.icon}</Text>
+          ) : (
+            <>&nbsp;</>
+          )}
         </StatHelpText>
       </>
     )}
@@ -196,10 +208,22 @@ const DashboardStats = () => {
   return (
     <HStack spacing={10}>
       <DashboardStat
+        title="Current Visitors"
+        loading={!data}
+        new={data?.countLiveUsers}
+        icon={<MdPerson />}
+      />
+      <DashboardStat
         title="Total Page Views"
         loading={!data}
         old={data?.countPageviewsPrev}
         new={data?.countPageviews}
+      />
+      <DashboardStat
+        title="Unique Visitors"
+        loading={!data}
+        old={data?.countUsersPrev}
+        new={data?.countUsers}
       />
       <DashboardStat
         title="Total Sessions"

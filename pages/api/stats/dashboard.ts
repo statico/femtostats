@@ -32,6 +32,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     countPageviewsPrev,
     countSessionsPrev,
     averageSessionDurationPrev,
+    countUsers,
+    countUsersPrev,
+    countLiveUsers,
   ] = await Promise.all([
     stats.pageviewsByDay(start, end, siteId),
     stats.topByColumn("referrer", start, end, siteId),
@@ -46,6 +49,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     stats.countPageviews(prevStart, prevEnd, siteId),
     stats.countSessions(prevStart, prevEnd, siteId),
     stats.averageSessionDuration(prevStart, prevEnd, siteId),
+    stats.countUsers(start, end, siteId),
+    stats.countUsers(prevStart, prevEnd, siteId),
+    stats.countLiveUsers(start, end, siteId),
   ]);
 
   res.send(
@@ -63,6 +69,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       countPageviewsPrev,
       countSessionsPrev,
       averageSessionDurationPrev,
+      countUsers,
+      countUsersPrev,
+      countLiveUsers,
     })
   );
 }
