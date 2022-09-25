@@ -60,6 +60,21 @@ export const countSessions = (
     .where(filterSessions(start, end, siteId))
     .then((rows) => rows[0]["count(*)"]);
 
+export const countBounces = (start: DateTime, end: DateTime, siteId?: string) =>
+  db
+    .with(
+      "events_per_session",
+      db
+        .select("session_id", db.raw("count(*) as count"))
+        .from("events")
+        .where(filterEvents(start, end, siteId))
+        .groupBy("session_id")
+    )
+    .count<any>()
+    .from("events_per_session")
+    .where("count", 1)
+    .then((rows) => rows[0]["count(*)"]);
+
 export const countUsers = (start: DateTime, end: DateTime, siteId?: string) =>
   db
     .count<any>()
