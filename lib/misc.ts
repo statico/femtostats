@@ -1,3 +1,5 @@
+import fetch from "unfetch";
+
 export const singleParam = (
   value: string | string[] | number | undefined | null
 ): string => {
@@ -38,6 +40,22 @@ export const toURL = (base: string, queryParams?: QueryParams): string => {
     return base;
   }
 };
+
+export const post = (url: string, body: any) =>
+  fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+    .then(async (res) => {
+      if (res.ok) {
+        return res;
+      } else {
+        const text = await res.text();
+        return Promise.reject(`Request failed with error: ${text}`);
+      }
+    })
+    .then((res) => res.json());
 
 export const formatNumber = (value: any) => Number(value).toLocaleString();
 

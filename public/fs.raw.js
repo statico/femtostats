@@ -14,10 +14,11 @@
     nav = navigator;
 
   // IE isn't supported.
-  if (!doc.currentScript || typeof URL === "undefined") return;
+  var script = doc.currentScript;
+  if (!script || typeof URL === "undefined") return;
 
-  // What host will we make a POST request to?
-  var host = new URL(doc.currentScript.src).origin;
+  var host = new URL(script.src).origin;
+  var token = script.getAttribute("data-token");
 
   // Pick 64 bits of randomness for user IDs and session IDs.
   function generateID() {
@@ -98,6 +99,7 @@
   // Global event tracking function
   function trackEvent(name, data) {
     var body = {
+      t: token,
       n: name || null, // null == pageview
       i: userId,
       s: sessionId,

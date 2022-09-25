@@ -4,23 +4,28 @@ const random = require("random");
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+//
+// Populate the database with two sites and some random growing data for the
+// last 90 days.
+//
+
 exports.seed = async function (knex) {
   await knex("events").del();
   await knex("sessions").del();
-  await knex("properties").del();
+  await knex("sites").del();
 
-  const PROPERTIES = [
+  const SITES = [
     {
       id: 1,
       name: "Site A",
-      hostnames: "example.com",
-      token: "abcdef12345",
+      hostnames: "*",
+      token: "aaa",
     },
     {
       id: 2,
       name: "Site B",
-      hostnames: "example2.com",
-      token: "zzxxyy56789",
+      hostnames: "*",
+      token: "bbb",
     },
   ];
 
@@ -82,8 +87,8 @@ exports.seed = async function (knex) {
   const events = [];
   const sessions = [];
   for (let i = 0; i < 1e5; i++) {
-    const property = pick(PROPERTIES);
-    const hostname = property.hostnames.split(",")[0];
+    const site = pick(SITES);
+    const hostname = site.hostnames.split(",")[0];
     const userId = randomBytes(8).toString("hex");
     const sessionId = randomBytes(8).toString("hex");
     const country = pick(COUNTRIES);
@@ -111,7 +116,7 @@ exports.seed = async function (knex) {
 
       const row = {
         timestamp: Math.floor(timestamp),
-        property_id: property.id,
+        site_id: site.id,
         session_id: sessionId,
         name: null,
         hostname,
@@ -138,14 +143,14 @@ exports.seed = async function (knex) {
 
     sessions.push({
       id: sessionId,
-      property_id: property.id,
+      site_id: site.id,
       user_id: userId,
       started_at: Math.floor(start),
       ended_at: timestamp,
     });
   }
 
-  await knex.batchInsert("properties", PROPERTIES, 100);
+  await knex.batchInsert("sites", SITES, 100);
   await knex.batchInsert("events", events, 100);
   await knex.batchInsert("sessions", sessions, 100);
 };

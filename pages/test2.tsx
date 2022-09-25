@@ -9,7 +9,7 @@ export default function Page() {
       <Link href="/test">
         <a>Go Back</a>
       </Link>
-      <Script defer src="/fs.js" />
+      <Script defer src="/fs.js" data-token="aaa" />
     </Container>
   );
 }

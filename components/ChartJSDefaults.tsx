@@ -1,22 +1,23 @@
-import { useColorModeValue } from "@chakra-ui/react";
+import { useColorModeValue, useToken } from "@chakra-ui/react";
 import { Chart as ChartJS } from "chart.js";
-import { theme } from "lib/theme";
 
 export const ChartJSDefaults = () => {
-  const c = theme.colors;
-  const colors = {
-    text: useColorModeValue(c.black, c.white),
-    accent: useColorModeValue(c.teal[900], c.teal[400]),
-    grid: useColorModeValue(c.gray[300], c.gray[800]),
-  };
+  const [black, white, darkTeal, lightTeal, darkGray, lightGray] = useToken(
+    "colors",
+    ["black", "white", "teal.900", "teal.400", "gray.800", "gray.300"]
+  );
+
+  const text = useColorModeValue(black, white);
+  const accent = useColorModeValue(darkTeal, lightTeal);
+  const grid = useColorModeValue(lightGray, darkGray);
 
   try {
     ChartJS.defaults.responsive = true;
-    ChartJS.defaults.color = colors.text;
+    ChartJS.defaults.color = text;
     ChartJS.defaults.plugins.legend.display = false;
     ChartJS.defaults.datasets.line.pointRadius = 0;
-    ChartJS.defaults.datasets.line.borderColor = colors.accent;
-    ChartJS.defaults.scale.grid.color = colors.grid;
+    ChartJS.defaults.datasets.line.borderColor = accent;
+    ChartJS.defaults.scale.grid.color = grid;
   } catch (err) {
     // There might not be any charts on the page, in which case ChartJS didn't
     // get initialized.

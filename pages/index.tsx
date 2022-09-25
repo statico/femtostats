@@ -1,11 +1,10 @@
-import Flag from "react-world-flags";
-import countries from "i18n-iso-countries";
 import {
   Box,
   Center,
   Grid,
   GridItem,
   HStack,
+  IconButton,
   Select,
   Skeleton,
   SkeletonText,
@@ -32,11 +31,15 @@ import {
 } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
+import { useSiteEditor } from "components/SiteEditor";
 import { useBufferedValue } from "hooks/useBufferedValue";
+import countries from "i18n-iso-countries";
 import { formatNumber, statPercent, statType, toURL } from "lib/misc";
 import { DateTime, Duration } from "luxon";
 import { ReactElement, ReactNode } from "react";
 import { Chart } from "react-chartjs-2";
+import { MdSettings } from "react-icons/md";
+import Flag from "react-world-flags";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
@@ -61,7 +64,7 @@ const viewState = atom<ViewState>({
   effects: [syncEffect({ refine: viewChecker })],
 });
 
-export const useDashboardData = () => {
+const useDashboardData = () => {
   const view = useRecoilValue(viewState);
   const { data: raw } = useSWR(toURL("/api/stats/dashboard", view));
   const data = useBufferedValue(raw);
@@ -69,33 +72,50 @@ export const useDashboardData = () => {
 };
 
 export default function Page() {
+  const SiteEditor = useSiteEditor();
+
   return (
-    <Grid gap={4} gridTemplate={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
-      <GridItem>
-        <HostnameSelector />
-      </GridItem>
-      <GridItem display="flex" justifyContent="flex-end">
-        <DateRangeSelector />
-      </GridItem>
+    <>
+      <SiteEditor.Component />
+      <Grid gap={4} gridTemplate={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
+        <GridItem>
+          <HStack>
+            <HostnameSelector />
+            <IconButton
+              variant="ghost"
+              icon={<MdSettings />}
+              onClick={SiteEditor.show}
+              aria-label={"Show site editor"}
+            />
+          </HStack>
+        </GridItem>
+        <GridItem display="flex" justifyContent="flex-end">
+          <DateRangeSelector />
+        </GridItem>
 
-      <GridItem colSpan={2}>
-        <Card>
-          <DashboardStats />
-          <PageViewChart />
-        </Card>
-      </GridItem>
+        <GridItem colSpan={2}>
+          <Card>
+            <DashboardStats />
+            <PageViewChart />
+          </Card>
+        </GridItem>
 
-      <TopTable title="Referrers" column="referrer" dataKey="topReferrers" />
-      <TopTable title="Pathnames" column="pathname" dataKey="topPathnames" />
-      <TopTable title="Countries" column="country" dataKey="topCountries" />
-      <TopTable title="Browsers" column="browser" dataKey="topBrowsers" />
-      <TopTable
-        title="Operating Systems"
-        column="os"
-        dataKey="topOperatingSystems"
-      />
-      <TopTable title="Device Types" column="device" dataKey="topDeviceTypes" />
-    </Grid>
+        <TopTable title="Referrers" column="referrer" dataKey="topReferrers" />
+        <TopTable title="Pathnames" column="pathname" dataKey="topPathnames" />
+        <TopTable title="Countries" column="country" dataKey="topCountries" />
+        <TopTable title="Browsers" column="browser" dataKey="topBrowsers" />
+        <TopTable
+          title="Operating Systems"
+          column="os"
+          dataKey="topOperatingSystems"
+        />
+        <TopTable
+          title="Device Types"
+          column="device"
+          dataKey="topDeviceTypes"
+        />
+      </Grid>
+    </>
   );
 }
 
