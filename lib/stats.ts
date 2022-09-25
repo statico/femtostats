@@ -30,6 +30,7 @@ export const pageviewsByDay = (
     )
     .from("events")
     .where(filterEvents(start, end, siteId))
+    .whereNull("name")
     .groupByRaw("strftime('%Y-%m-%d', timestamp, 'unixepoch')")
     .then((rows) => ({
       labels: rows.map((row: any) => row.date),
@@ -45,6 +46,7 @@ export const countPageviews = (
     .count<any>()
     .from("events")
     .where(filterEvents(start, end, siteId))
+    .whereNull("name")
     .then((rows) => rows[0]["count(*)"]);
 
 export const countSessions = (
@@ -70,7 +72,8 @@ export const averageSessionDuration = (
     .whereNotNull("ended_at")
     .then((rows) => Math.round(rows[0].avg));
 
-export const topReferrers = (
+export const topByColumn = (
+  column: string,
   start: DateTime,
   end: DateTime,
   siteId?: string,
@@ -80,95 +83,11 @@ export const topReferrers = (
     .with(
       "top",
       db
-        .select("referrer", db.raw("count(*) as count"))
+        .select(column, db.raw("count(*) as count"))
         .from("events")
         .where(filterEvents(start, end, siteId))
         .whereNull("name")
-        .groupBy("referrer")
-    )
-    .select()
-    .from("top")
-    .orderBy("count", "desc")
-    .limit(limit);
-
-export const topPathnames = (
-  start: DateTime,
-  end: DateTime,
-  siteId?: string,
-  limit = 10
-) =>
-  db
-    .with(
-      "top",
-      db
-        .select("pathname", db.raw("count(*) as count"))
-        .from("events")
-        .where(filterEvents(start, end, siteId))
-        .whereNull("name")
-        .groupBy("pathname")
-    )
-    .select()
-    .from("top")
-    .orderBy("count", "desc")
-    .limit(limit);
-
-export const topCountries = (
-  start: DateTime,
-  end: DateTime,
-  siteId?: string,
-  limit = 10
-) =>
-  db
-    .with(
-      "top",
-      db
-        .select("country", db.raw("count(*) as count"))
-        .from("events")
-        .where(filterEvents(start, end, siteId))
-        .whereNull("name")
-        .groupBy("country")
-    )
-    .select()
-    .from("top")
-    .orderBy("count", "desc")
-    .limit(limit);
-
-export const topBrowsers = (
-  start: DateTime,
-  end: DateTime,
-  siteId?: string,
-  limit = 10
-) =>
-  db
-    .with(
-      "top",
-      db
-        .select("browser", db.raw("count(*) as count"))
-        .from("events")
-        .where(filterEvents(start, end, siteId))
-        .whereNull("name")
-        .groupBy("browser")
-    )
-    .select()
-    .from("top")
-    .orderBy("count", "desc")
-    .limit(limit);
-
-export const topOperatingSystems = (
-  start: DateTime,
-  end: DateTime,
-  siteId?: string,
-  limit = 10
-) =>
-  db
-    .with(
-      "top",
-      db
-        .select("os", db.raw("count(*) as count"))
-        .from("events")
-        .where(filterEvents(start, end, siteId))
-        .whereNull("name")
-        .groupBy("os")
+        .groupBy(column)
     )
     .select()
     .from("top")
