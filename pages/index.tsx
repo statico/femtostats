@@ -1,6 +1,5 @@
 import {
   Box,
-  Center,
   Grid,
   GridItem,
   HStack,
@@ -17,7 +16,6 @@ import {
   Table,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -28,18 +26,15 @@ import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { useSiteEditor } from "components/SiteEditor";
 import { useBufferedValue } from "hooks/useBufferedValue";
-import countries from "i18n-iso-countries";
 import { formatNumber, statPercent, statType, toURL } from "lib/misc";
 import { DateTime, Duration } from "luxon";
 import { ReactElement, ReactNode } from "react";
 import { Chart } from "react-chartjs-2";
 import { MdSettings } from "react-icons/md";
-import Flag from "react-world-flags";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { syncEffect } from "recoil-sync";
 import useSWR from "swr";
-
-countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+import { Country } from "../components/Country";
 
 const viewChecker = object({
   siteId: optional(number()),
@@ -317,7 +312,7 @@ const TopTable = ({
                 >
                   <Box zIndex={1} position="relative">
                     {column === "country" ? (
-                      <Country value={row.country} count={row.count} />
+                      <Country code={row.country} />
                     ) : (
                       row[column] || "(none)"
                     )}
@@ -332,27 +327,5 @@ const TopTable = ({
         <SkeletonText spacing={4} noOfLines={10} />
       )}
     </Card>
-  );
-};
-
-const Country = ({ value, count }: { value: string | null; count: number }) => {
-  const name =
-    countries.getName(value || "", "en", { select: "alias" }) ||
-    value ||
-    "(unknown)";
-  return (
-    <HStack>
-      <Flag
-        code={value ?? ""}
-        height="20px"
-        width="20px"
-        fallback={
-          <Center h="16px" w="20px" bg="black" color="white">
-            ?
-          </Center>
-        }
-      />
-      <Text>{name}</Text>
-    </HStack>
   );
 };
