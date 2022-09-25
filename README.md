@@ -4,7 +4,7 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 
 [![build status](https://img.shields.io/github/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?style=flat-square)](https://ghcr.io/statico/femtostats)
 
-<img width="1437" alt="CleanShot 2022-09-20 at 19 05 11@2x" src="https://user-images.githubusercontent.com/137158/191397904-0e6d58b4-735a-4502-825e-189855638b9d.png">
+<img height="800" alt="CleanShot 2022-09-25 at 12 43 28@2x" src="https://user-images.githubusercontent.com/137158/192162253-11532bc6-9c5b-474b-95d3-f286e7aaa19b.png">
 
 ## Why?
 
