@@ -1,15 +1,19 @@
 import {
   Box,
   Container,
+  Flex,
   Heading,
   HStack,
+  IconButton,
   Image,
   LinkBox,
   LinkOverlay,
   Stack,
+  useColorMode,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import { ReactNode } from "react";
+import { MdModeNight, MdWbSunny } from "react-icons/md";
 
 type Props = {
   children: ReactNode;
@@ -24,21 +28,44 @@ export default function DefaultLayout({ title, children }: Props) {
       </Head>
       <Container maxW="container.xl" py={4}>
         <Stack spacing={4}>
-          <HStack as="header" w="auto">
+          <Flex as="header" justify="space-between">
             <LinkBox>
               <LinkOverlay href="/">
-                <Image src="/favicon.png" boxSize={10} alt="Femtostats logo" />
+                <HStack>
+                  <Image
+                    src="/favicon.png"
+                    boxSize={10}
+                    alt="Femtostats logo"
+                  />
+                  <Heading>Femtostats</Heading>
+                </HStack>
               </LinkOverlay>
             </LinkBox>
-            <LinkBox>
-              <LinkOverlay href="/">
-                <Heading>Femtostats</Heading>
-              </LinkOverlay>
-            </LinkBox>
-          </HStack>
+            <Box>
+              <ColorModeToggle />
+            </Box>
+          </Flex>
           <Box as="main">{children}</Box>
         </Stack>
       </Container>
     </>
   );
 }
+
+const ColorModeToggle = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
+  return (
+    <IconButton
+      variant="ghost"
+      icon={colorMode === "dark" ? <MdWbSunny /> : <MdModeNight />}
+      onClick={() => {
+        toggleColorMode();
+
+        // Not sure how to fix the Chart colors not updating. Maybe
+        // https://stackoverflow.com/questions/63565630 ?
+        location.reload();
+      }}
+      aria-label={"Toggle light/dark mode"}
+    />
+  );
+};
