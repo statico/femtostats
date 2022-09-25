@@ -22,13 +22,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import {
-  CheckerReturnType,
-  number,
-  object,
-  optional,
-  string,
-} from "@recoiljs/refine";
+import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { useSiteEditor } from "components/SiteEditor";
@@ -47,7 +41,7 @@ import useSWR from "swr";
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
 const viewChecker = object({
-  hostname: optional(string()),
+  siteId: optional(number()),
   start: optional(number()),
   end: optional(number()),
 });
@@ -57,7 +51,7 @@ type ViewState = CheckerReturnType<typeof viewChecker>;
 const viewState = atom<ViewState>({
   key: "view",
   default: {
-    hostname: undefined,
+    siteId: undefined,
     start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
     end: Math.floor(DateTime.now().toSeconds()),
   },
@@ -80,7 +74,7 @@ export default function Page() {
       <Grid gap={4} gridTemplate={{ base: "1fr", lg: "repeat(2, 1fr)" }}>
         <GridItem>
           <HStack>
-            <HostnameSelector />
+            <SiteSelector />
             <IconButton
               variant="ghost"
               icon={<MdSettings />}
@@ -129,22 +123,23 @@ const Card = ({ children }: { children: ReactNode }) => (
   </Stack>
 );
 
-const HostnameSelector = () => {
+const SiteSelector = () => {
   const [view, setView] = useRecoilState(viewState);
-  const { data } = useSWR("/api/stats/hostnames");
+  const { data } = useSWR("/api/stats/sites/list");
   return (
     <Select
       maxW="xs"
-      defaultValue={view.hostname}
+      defaultValue={data?.sites?.[0]?.id}
       onChange={(e) => {
-        const hostname = e.target.value || undefined;
-        setView({ ...view, hostname });
+        const siteId = Number(e.target.value) || undefined;
+        setView({ ...view, siteId });
       }}
     >
-      <option value="">All Hostnames</option>
       {data &&
-        data.hostnames.map((hostname: string) => (
-          <option key={hostname}>{hostname}</option>
+        data.sites.map((site: any) => (
+          <option key={site.id} value={site.id}>
+            {site.name}
+          </option>
         ))}
     </Select>
   );

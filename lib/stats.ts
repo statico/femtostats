@@ -3,25 +3,25 @@ import { DateTime } from "luxon";
 import db from "./db";
 
 const filterEvents =
-  (start: DateTime, end: DateTime, hostname?: string) =>
+  (start: DateTime, end: DateTime, siteId?: string) =>
   (q: Knex.QueryBuilder) => {
     q.where("timestamp", ">=", Math.floor(start.toSeconds()));
     q.where("timestamp", "<=", Math.floor(end.toSeconds()));
-    if (hostname) q.where("hostname", hostname);
+    if (siteId) q.where("site_id", siteId);
   };
 
 const filterSessions =
-  (start: DateTime, end: DateTime, hostname?: string) =>
+  (start: DateTime, end: DateTime, siteId?: string) =>
   (q: Knex.QueryBuilder) => {
     q.where("started_at", ">=", Math.floor(start.toSeconds()));
     q.where("started_at", "<=", Math.floor(end.toSeconds()));
-    if (hostname) q.where("hostname", hostname);
+    if (siteId) q.where("site_id", siteId);
   };
 
 export const pageviewsByDay = (
   start: DateTime,
   end: DateTime,
-  hostname?: string
+  siteId?: string
 ) =>
   db
     .select(
@@ -29,7 +29,7 @@ export const pageviewsByDay = (
       db.raw("count(*) as count")
     )
     .from("events")
-    .where(filterEvents(start, end, hostname))
+    .where(filterEvents(start, end, siteId))
     .groupByRaw("strftime('%Y-%m-%d', timestamp, 'unixepoch')")
     .then((rows) => ({
       labels: rows.map((row: any) => row.date),
@@ -39,41 +39,41 @@ export const pageviewsByDay = (
 export const countPageviews = (
   start: DateTime,
   end: DateTime,
-  hostname?: string
+  siteId?: string
 ) =>
   db
     .count<any>()
     .from("events")
-    .where(filterEvents(start, end, hostname))
+    .where(filterEvents(start, end, siteId))
     .then((rows) => rows[0]["count(*)"]);
 
 export const countSessions = (
   start: DateTime,
   end: DateTime,
-  hostname?: string
+  siteId?: string
 ) =>
   db
     .count<any>()
     .from("sessions")
-    .where(filterSessions(start, end, hostname))
+    .where(filterSessions(start, end, siteId))
     .then((rows) => rows[0]["count(*)"]);
 
 export const averageSessionDuration = (
   start: DateTime,
   end: DateTime,
-  hostname?: string
+  siteId?: string
 ) =>
   db
     .select(db.raw("avg(ended_at - started_at) as avg"))
     .from("sessions")
-    .where(filterSessions(start, end, hostname))
+    .where(filterSessions(start, end, siteId))
     .whereNotNull("ended_at")
     .then((rows) => Math.round(rows[0].avg));
 
 export const topReferrers = (
   start: DateTime,
   end: DateTime,
-  hostname?: string,
+  siteId?: string,
   limit = 10
 ) =>
   db
@@ -82,7 +82,7 @@ export const topReferrers = (
       db
         .select("referrer", db.raw("count(*) as count"))
         .from("events")
-        .where(filterEvents(start, end, hostname))
+        .where(filterEvents(start, end, siteId))
         .whereNull("name")
         .groupBy("referrer")
     )
@@ -94,7 +94,7 @@ export const topReferrers = (
 export const topPathnames = (
   start: DateTime,
   end: DateTime,
-  hostname?: string,
+  siteId?: string,
   limit = 10
 ) =>
   db
@@ -103,7 +103,7 @@ export const topPathnames = (
       db
         .select("pathname", db.raw("count(*) as count"))
         .from("events")
-        .where(filterEvents(start, end, hostname))
+        .where(filterEvents(start, end, siteId))
         .whereNull("name")
         .groupBy("pathname")
     )
@@ -115,7 +115,7 @@ export const topPathnames = (
 export const topCountries = (
   start: DateTime,
   end: DateTime,
-  hostname?: string,
+  siteId?: string,
   limit = 10
 ) =>
   db
@@ -124,7 +124,7 @@ export const topCountries = (
       db
         .select("country", db.raw("count(*) as count"))
         .from("events")
-        .where(filterEvents(start, end, hostname))
+        .where(filterEvents(start, end, siteId))
         .whereNull("name")
         .groupBy("country")
     )
@@ -136,7 +136,7 @@ export const topCountries = (
 export const topBrowsers = (
   start: DateTime,
   end: DateTime,
-  hostname?: string,
+  siteId?: string,
   limit = 10
 ) =>
   db
@@ -145,7 +145,7 @@ export const topBrowsers = (
       db
         .select("browser", db.raw("count(*) as count"))
         .from("events")
-        .where(filterEvents(start, end, hostname))
+        .where(filterEvents(start, end, siteId))
         .whereNull("name")
         .groupBy("browser")
     )
@@ -157,7 +157,7 @@ export const topBrowsers = (
 export const topOperatingSystems = (
   start: DateTime,
   end: DateTime,
-  hostname?: string,
+  siteId?: string,
   limit = 10
 ) =>
   db
@@ -166,7 +166,7 @@ export const topOperatingSystems = (
       db
         .select("os", db.raw("count(*) as count"))
         .from("events")
-        .where(filterEvents(start, end, hostname))
+        .where(filterEvents(start, end, siteId))
         .whereNull("name")
         .groupBy("os")
     )
@@ -178,7 +178,7 @@ export const topOperatingSystems = (
 export const topDeviceTypes = (
   start: DateTime,
   end: DateTime,
-  hostname?: string,
+  siteId?: string,
   limit = 10
 ) =>
   db
@@ -196,7 +196,7 @@ export const topDeviceTypes = (
           `)
         )
         .from("events")
-        .where(filterEvents(start, end, hostname))
+        .where(filterEvents(start, end, siteId))
         .whereNull("name")
     )
     .select("device", db.raw("count(*) as count"))

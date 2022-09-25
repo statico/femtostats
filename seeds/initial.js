@@ -86,8 +86,8 @@ exports.seed = async function (knex) {
   const rand = random.exponential();
   const events = [];
   const sessions = [];
-  for (let i = 0; i < 1e5; i++) {
-    const site = pick(SITES);
+  for (let i = 0; i < 1e4; i++) {
+    const site = Math.random() > 0.75 ? SITES[0] : SITES[1];
     const hostname = site.hostnames.split(",")[0];
     const userId = randomBytes(8).toString("hex");
     const sessionId = randomBytes(8).toString("hex");
@@ -105,13 +105,9 @@ exports.seed = async function (knex) {
 
     const start = NOW - rand() * 7776000;
     let timestamp = start;
-    let referrer = pick(REFERRERS);
     let pathname = null;
     const eventCount = rand() * 4;
     for (let j = 0; j < eventCount; j++) {
-      if (pathname) {
-        referrer = "https://" + hostname + pathname;
-      }
       pathname = pick(PATHNAMES);
 
       const row = {
@@ -121,7 +117,7 @@ exports.seed = async function (knex) {
         name: null,
         hostname,
         pathname,
-        referrer,
+        referrer: pick(REFERRERS),
         country,
         os: ua.os.name,
         os_version: ua.os.version,

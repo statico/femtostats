@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  const hostname = singleParam(req.query.hostname);
+  const siteId = singleParam(req.query.siteId);
   const start = DateTime.fromSeconds(
     Number(singleParam(req.query.start)) ||
       DateTime.now().minus({ days: 30 }).toSeconds()
@@ -33,19 +33,19 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     countSessionsPrev,
     averageSessionDurationPrev,
   ] = await Promise.all([
-    stats.pageviewsByDay(start, end, hostname),
-    stats.topReferrers(start, end, hostname),
-    stats.topPathnames(start, end, hostname),
-    stats.topCountries(start, end, hostname),
-    stats.topBrowsers(start, end, hostname),
-    stats.topOperatingSystems(start, end, hostname),
-    stats.topDeviceTypes(start, end, hostname),
-    stats.countPageviews(start, end, hostname),
-    stats.countSessions(start, end, hostname),
-    stats.averageSessionDuration(start, end, hostname),
-    stats.countPageviews(prevStart, prevEnd, hostname),
-    stats.countSessions(prevStart, prevEnd, hostname),
-    stats.averageSessionDuration(prevStart, prevEnd, hostname),
+    stats.pageviewsByDay(start, end, siteId),
+    stats.topReferrers(start, end, siteId),
+    stats.topPathnames(start, end, siteId),
+    stats.topCountries(start, end, siteId),
+    stats.topBrowsers(start, end, siteId),
+    stats.topOperatingSystems(start, end, siteId),
+    stats.topDeviceTypes(start, end, siteId),
+    stats.countPageviews(start, end, siteId),
+    stats.countSessions(start, end, siteId),
+    stats.averageSessionDuration(start, end, siteId),
+    stats.countPageviews(prevStart, prevEnd, siteId),
+    stats.countSessions(prevStart, prevEnd, siteId),
+    stats.averageSessionDuration(prevStart, prevEnd, siteId),
   ]);
 
   res.send(
