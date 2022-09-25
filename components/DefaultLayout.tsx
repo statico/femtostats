@@ -24,14 +24,18 @@ export default function DefaultLayout({ title, children }: Props) {
       </Head>
       <Container maxW="container.xl" py={4}>
         <Stack spacing={4}>
-          <LinkBox>
-            <HStack as="header">
-              <Image src="/favicon.png" boxSize={10} alt="Femtostats logo" />
+          <HStack as="header" w="auto">
+            <LinkBox>
+              <LinkOverlay href="/">
+                <Image src="/favicon.png" boxSize={10} alt="Femtostats logo" />
+              </LinkOverlay>
+            </LinkBox>
+            <LinkBox>
               <LinkOverlay href="/">
                 <Heading>Femtostats</Heading>
               </LinkOverlay>
-            </HStack>
-          </LinkBox>
+            </LinkBox>
+          </HStack>
           <Box as="main">{children}</Box>
         </Stack>
       </Container>
