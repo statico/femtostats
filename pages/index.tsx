@@ -245,7 +245,9 @@ const DashboardStats = () => {
         loading={!data}
         old={data?.countBounces / data?.countSessions}
         new={data?.countBouncesPrev / data?.countSessionsPrev}
-        formatter={(x: any) => Number(x * 100).toFixed(1) + "%"}
+        formatter={(x: any) =>
+          isNaN(x) ? "n/a" : Number(x * 100).toFixed(1) + "%"
+        }
       />
     </HStack>
   );
