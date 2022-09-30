@@ -22,6 +22,8 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 
 ## Why not use ........?
 
+|What|Why not?|
+|----|--------|
 |Google Analytics|Blocked by ad blockers and feeds your site's data into the Google data machine|
 |CloudFlare Web Analytics|Blocked by ad blockers|
 |Plausible|Self-hosting requires both additional Postgres and Clickhouse databases|
