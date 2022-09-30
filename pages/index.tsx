@@ -137,6 +137,7 @@ const SiteSelector = () => {
         setView({ ...view, siteId });
       }}
     >
+      <option>All Sites</option>
       {data &&
         data.sites.map((site: any) => (
           <option key={site.id} value={site.id}>
