@@ -100,7 +100,7 @@
       i: userId,
       s: sessionId,
       u: loc.href,
-      r: loc.referrer,
+      r: doc.referrer,
       w: win.innerWidth,
       d: data,
     };
