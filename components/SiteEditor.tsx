@@ -127,7 +127,7 @@ const SiteEditor = () => {
   useEffect(() => {
     if (typeof location !== "undefined") {
       setTag(
-        `<script src="${location.origin}/script.js" data-token="${site.token}" defer></script>`
+        `<script src="${location.origin}/data.js" data-token="${site.token}" defer></script>`
       );
     }
   });

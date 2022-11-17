@@ -22,7 +22,7 @@ export default function Page() {
           <a>Leave Site</a>
         </Link>
       </Stack>
-      <Script defer src="/script.js" data-token="aaa" />
+      <Script defer src="/data.js" data-token="aaa" />
     </Container>
   );
 }

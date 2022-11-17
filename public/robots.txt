@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /script.js
 Allow: /script.raw.js
+Allow: /data.js
 Disallow: /

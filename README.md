@@ -37,7 +37,7 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
    - Check out the `docker-compose.yml` file in this repo as an example.
    - See below instructions on creating a Maxmind account to resolve geographic location at the country level.
    - Specify a `PASSWORD` env var to protect your dashboard behind a password (the username is `admin`).
-1. Include the tag `<script defer src="https://your-femtostats.com/script.js"></script>` on the pages you want to track.
+1. Include the tag `<script defer src="https://your-femtostats.com/data.js"></script>` on the pages you want to track.
 1. For custom event tracking, call `window.femtostats('event name')`
 
 ### Enabling Country Resolution
@@ -53,6 +53,10 @@ To record which country the user has originated from, you need a geoip database.
 
 By default, Femtostats stores a simple cookie on the client to count unique users and user sessions. You can disable the use of cookies entirely by adding `data-cookies="false"` to the `<script>` tag you embed on your site. Sessions will still show in the dashboard, but without cookies, the definition of a session changes from "a user's browser session" to "a single page view."
 
+### Other notes
+
+The script tag instructions used to reference `script.js`, but uBlock appears to be [blocking that](https://github.com/uBlockOrigin/uAssets/blob/927dec7c9c60b6c1701d69ea9f8e5923644dd9dc/filters/privacy.txt#L376).
+
 ## Development
 
 Requires Node.js 16+ and Yarn. Run `yarn` and `yarn dev`.
@@ -63,11 +67,6 @@ This project uses [Next.js](https://nextjs.org/), [React](https://reactjs.org/),
 
 ## Future Ideas
 
-- Realtime visitor count
-- Visitors vs. pageviews
-- Track country codes with the MaxMind database
-- Do some load testing
 - Use the [better-sqlite3](https://www.npmjs.com/package/better-sqlite3) driver
-- Compact/vacuum the database
 - Support other databases, maybe, I dunno
 - Support UTM campaigns
