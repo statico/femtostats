@@ -23,7 +23,7 @@
     "framer-motion": "^7.3.5",
     "glob-to-regexp": "^0.4.1",
     "i18n-iso-countries": "^7.5.0",
-    "knex": "^2.3.0",
+    "knex": "^2.4.0",
     "luxon": "^3.0.3",
     "maxmind": "^4.3.6",
     "next": "^12.3.0",
