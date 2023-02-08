@@ -2,7 +2,7 @@
 
 Femtostats is a lightweight, tiny, privacy-focused web statistics provider with no RDBMS requirement.
 
-[![build status](https://img.shields.io/github/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?style=flat-square)](https://ghcr.io/statico/femtostats)
+[![build status](https://img.shields.io/github/actions/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?branch=main&style=flat-square)](https://ghcr.io/statico/femtostats)
 
 <img height="800" alt="CleanShot 2022-09-25 at 12 43 28@2x" src="https://user-images.githubusercontent.com/137158/192162253-11532bc6-9c5b-474b-95d3-f286e7aaa19b.png">
 
@@ -22,14 +22,14 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 
 ## Why not use ........?
 
-|What|Why not?|
-|----|--------|
-|Google Analytics|Blocked by ad blockers and feeds your site's data into the Google data machine|
-|CloudFlare Web Analytics|Blocked by ad blockers|
-|Plausible|Self-hosting requires both additional Postgres and Clickhouse databases|
-|Fathom Lite|The project is in maintenance-only mode and requires a Fathom account|
-|Server logs|Doesn't record client information or sessions|
-|CloudFront logs + S3 + Athena|Logs only get dumped once per day and querying requires writing raw SQL|
+| What                          | Why not?                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| Google Analytics              | Blocked by ad blockers and feeds your site's data into the Google data machine |
+| CloudFlare Web Analytics      | Blocked by ad blockers                                                         |
+| Plausible                     | Self-hosting requires both additional Postgres and Clickhouse databases        |
+| Fathom Lite                   | The project is in maintenance-only mode and requires a Fathom account          |
+| Server logs                   | Doesn't record client information or sessions                                  |
+| CloudFront logs + S3 + Athena | Logs only get dumped once per day and querying requires writing raw SQL        |
 
 ## Getting Started
 
