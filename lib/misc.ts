@@ -1,4 +1,4 @@
-import fetch from "unfetch";
+import fetch from "isomorphic-unfetch";
 
 export const singleParam = (
   value: string | string[] | number | undefined | null

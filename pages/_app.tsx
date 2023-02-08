@@ -9,7 +9,7 @@ import { ReactElement, ReactNode } from "react";
 import { RecoilRoot } from "recoil";
 import { RecoilURLSyncJSON } from "recoil-sync";
 import { SWRConfig } from "swr";
-import fetch from "unfetch";
+import fetch from "isomorphic-unfetch";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;

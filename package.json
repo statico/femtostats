@@ -23,6 +23,7 @@
     "framer-motion": "^9.0.2",
     "glob-to-regexp": "^0.4.1",
     "i18n-iso-countries": "^7.5.0",
+    "isomorphic-unfetch": "^4.0.2",
     "knex": "^2.4.2",
     "luxon": "^3.2.1",
     "maxmind": "^4.3.8",
