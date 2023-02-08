@@ -2,7 +2,7 @@
 
 Femtostats is a lightweight, tiny, privacy-focused web statistics provider with no RDBMS requirement.
 
-[![build status](https://img.shields.io/github/actions/workflow/status/statico/femtostats/Create%20and%20publish%20a%20Docker%20image.svg?branch=main&style=flat-square)](https://ghcr.io/statico/femtostats)
+[![build status](https://img.shields.io/github/actions/workflow/status/statico/femtostats/build.yml?branch=main&style=flat-square)](https://ghcr.io/statico/femtostats)
 
 <img height="800" alt="CleanShot 2022-09-25 at 12 43 28@2x" src="https://user-images.githubusercontent.com/137158/192162253-11532bc6-9c5b-474b-95d3-f286e7aaa19b.png">
 
