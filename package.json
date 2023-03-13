@@ -35,7 +35,7 @@
     "react-world-flags": "^1.5.1",
     "recoil": "^0.7.6",
     "recoil-sync": "^0.2.0",
-    "sqlite3": "^5.1.4",
+    "sqlite3": "^5.1.5",
     "swr": "^2.0.3",
     "tar-stream": "^3.0.0",
     "ua-parser-js": "^1.0.33",
