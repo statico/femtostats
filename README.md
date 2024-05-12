@@ -8,12 +8,12 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 
 ## Why?
 
-- Easily self-hostable
+- Self-hostable
 - Easy setup with a single `<script>` tag
 - Simple pageview and session tracking
 - Arbitrary client-side event tracking
 - Realtime visitor count
-- No external database requirement
+- No external database requirement (uses SQLite)
 - Not blocked by common ad blockers and browsers
 - No storage of personally-identifable data (PII)
 - Collection of client-side performance stats and screen width
@@ -36,7 +36,9 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
 1. Host the image `ghcr.io/statico/femtostats` wherever you want.
    - Check out the `docker-compose.yml` file in this repo as an example.
    - See below instructions on creating a Maxmind account to resolve geographic location at the country level.
-   - Specify a `PASSWORD` env var to protect your dashboard behind a password (the username is `admin`).
+   - Set a `PASSWORD` env var to protect your dashboard behind a password (the username is `admin`).
+   - Set a `DATA_DIR` env var to store the SQLite database and Maxmind database. (Default is `/tmp`.)
+1. Run `pnpm knex migrate:latest` to initialize the database.
 1. Include the tag `<script defer src="https://your-femtostats.com/data.js"></script>` on the pages you want to track.
 1. For custom event tracking, call `window.femtostats('event name')`
 
@@ -59,9 +61,9 @@ The script tag instructions used to reference `script.js`, but uBlock appears to
 
 ## Development
 
-Requires Node.js 16+ and Yarn. Run `yarn` and `yarn dev`.
+Requires Node.js 16+ and [pnpm](https://pnpm.io). Run `pnpm` and `pnpm install`.
 
-The default database location is `/tmp/stats.db`. Run `yarn exec knex seed:run` to populate the database with some sample data.
+The default database location is `/tmp/stats.db`. Run `pnpm exec knex seed:run` to populate the database with some sample data.
 
 This project uses [Next.js](https://nextjs.org/), [React](https://reactjs.org/), [SWR](https://swr.vercel.app/), [Recoil](https://recoiljs.org/), [Chakra UI](https://chakra-ui.com/), and [Chart.js](https://www.chartjs.org/).
 
