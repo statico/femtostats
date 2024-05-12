@@ -1,17 +1,11 @@
 import dotenv from "dotenv";
-import maxmind from "maxmind";
-import {
-  createReadStream,
-  existsSync,
-  statSync,
-  writeFile,
-  writeFileSync,
-} from "fs";
+import { existsSync, statSync, writeFileSync } from "fs";
+import { get } from "https";
 import { DateTime } from "luxon";
+import maxmind from "maxmind";
+import { basename } from "path";
 import tar from "tar-stream";
 import { createGunzip } from "zlib";
-import { get } from "https";
-import { basename } from "path";
 
 dotenv.config();
 
@@ -59,7 +53,10 @@ export const getCountryForIP = async (ip: string) => {
   if (existsSync(path)) {
     const maxAge = DateTime.now().minus({ weeks: 1 });
     const lastModified = DateTime.fromJSDate(statSync(path).mtime);
-    if (lastModified < maxAge) await download();
+    if (lastModified < maxAge) {
+      console.log("Maxmind DB is older than 1 week - redownloading");
+      await download();
+    }
   } else {
     if (!url) {
       if (!hasLoggedError) {
@@ -68,6 +65,7 @@ export const getCountryForIP = async (ip: string) => {
       }
       return;
     }
+    console.log("Maxmind DB not found - downloading");
     await download();
   }
 
