@@ -6,9 +6,7 @@ export default function Page() {
   return (
     <Container>
       <Heading>Other Page</Heading>
-      <Link href="/test">
-        <a>Go Back</a>
-      </Link>
+      <Link href="/test">Go Back</Link>
       <Script defer src="/data.js" data-token="aaa" />
     </Container>
   );

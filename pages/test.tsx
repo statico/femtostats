@@ -15,12 +15,8 @@ export default function Page() {
         >
           Track Click Event
         </Button>
-        <Link href="/test2">
-          <a>Go to Test 2</a>
-        </Link>
-        <Link href="https://www.example.com/">
-          <a>Leave Site</a>
-        </Link>
+        <Link href="/test2">Go to Test 2</Link>
+        <Link href="https://www.example.com/">Leave Site</Link>
       </Stack>
       <Script defer src="/data.js" data-token="aaa" />
     </Container>
