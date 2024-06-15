@@ -21,7 +21,7 @@ export function middleware(req: NextRequest) {
     const [username, password] = atob(auth.substring(5)).split(":");
 
     if (username !== HARDCODED_USERNAME || password !== secret)
-      throw new Error(`Invalid credentials from ${ip}`);
+      throw new Error("Invalid credentials");
     return NextResponse.next();
   } catch (err) {
     console.log(`Authentication error: ${err} from ${ip}`);

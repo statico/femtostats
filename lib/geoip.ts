@@ -15,6 +15,10 @@ const filename = "GeoLite2-Country.mmdb";
 const path = (process.env.DATA_DIR || "/tmp") + "/" + filename;
 const url = process.env.MAXMIND_GEOLITE2_COUNTRY_URL;
 
+const debug = (...args: any[]) => {
+  if (process.env.DEBUG) console.log("[DEBUG]", ...args);
+};
+
 const download = async () => {
   if (!url) throw "Cannot download Maxmind DB: Missing env var";
 
@@ -39,20 +43,31 @@ const download = async () => {
         const data = Buffer.concat(chunks);
         writeFileSync(path, data);
         console.log(`Wrote ${path} (${data.length} bytes)`);
+        console.log(`stat ${path}: ${JSON.stringify(statSync(path), null, 2)}`);
       }
     });
 
     console.log(`Downloading ${filename}...`);
+    debug(`GET ${url}`);
     get(url, (res) => {
-      res.pipe(createGunzip()).pipe(extract);
+      if (res.statusCode === 200) {
+        res.pipe(createGunzip()).pipe(extract);
+      } else {
+        reject(
+          `Failed to download Maxmind DB: ${res.statusCode} ${res.statusMessage}`,
+        );
+      }
     });
   });
 };
 
 export const getCountryForIP = async (ip: string) => {
   if (existsSync(path)) {
+    debug("Maxmind DB exists", path);
     const maxAge = DateTime.now().minus({ weeks: 1 });
+    debug("Maxmind DB maxAge", maxAge.toISO());
     const lastModified = DateTime.fromJSDate(statSync(path).mtime);
+    debug("Maxmind DB lastModified", lastModified.toISO());
     if (lastModified < maxAge) {
       console.log("Maxmind DB is older than 1 week - redownloading");
       await download();
