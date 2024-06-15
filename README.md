@@ -38,7 +38,7 @@ Femtostats is a lightweight, tiny, privacy-focused web statistics provider with 
    - See below instructions on creating a Maxmind account to resolve geographic location at the country level.
    - Set a `PASSWORD` env var to protect your dashboard behind a password (the username is `admin`).
    - Set a `DATA_DIR` env var to store the SQLite database and Maxmind database. (Default is `/tmp`.)
-1. Run `pnpm knex migrate:latest` to initialize the database.
+1. Run `pnpm knex:migrate` to initialize the database.
 1. Include the tag `<script defer src="https://your-femtostats.com/data.js"></script>` on the pages you want to track.
 1. For custom event tracking, call `window.femtostats('event name')`
 
@@ -63,7 +63,7 @@ The script tag instructions used to reference `script.js`, but uBlock appears to
 
 Requires Node.js 16+ and [pnpm](https://pnpm.io). Run `pnpm` and `pnpm install`.
 
-The default database location is `/tmp/stats.db`. Run `pnpm exec knex seed:run` to populate the database with some sample data.
+The default database location is `/tmp/stats.db`. Run `pnpm knex:seed` to populate the database with some sample data.
 
 This project uses [Next.js](https://nextjs.org/), [React](https://reactjs.org/), [SWR](https://swr.vercel.app/), [Recoil](https://recoiljs.org/), [Chakra UI](https://chakra-ui.com/), and [Chart.js](https://www.chartjs.org/).
 
