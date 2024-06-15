@@ -3,7 +3,6 @@ services:
   femtostats:
     image: ghcr.io/statico/femtostats
     container_name: femtostats
-    user: nextjs
     volumes:
       - ~/stats:/data
     environment:
