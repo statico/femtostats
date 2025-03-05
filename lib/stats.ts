@@ -21,12 +21,12 @@ const filterSessions =
 export const pageviewsByDay = (
   start: DateTime,
   end: DateTime,
-  siteId?: string
+  siteId?: string,
 ) =>
   db
     .select(
       db.raw("strftime('%Y-%m-%d', timestamp, 'unixepoch') as date"),
-      db.raw("count(*) as count")
+      db.raw("count(*) as count"),
     )
     .from("events")
     .where(filterEvents(start, end, siteId))
@@ -40,7 +40,7 @@ export const pageviewsByDay = (
 export const countPageviews = (
   start: DateTime,
   end: DateTime,
-  siteId?: string
+  siteId?: string,
 ) =>
   db
     .count<any>()
@@ -52,7 +52,7 @@ export const countPageviews = (
 export const countSessions = (
   start: DateTime,
   end: DateTime,
-  siteId?: string
+  siteId?: string,
 ) =>
   db
     .count<any>()
@@ -68,7 +68,7 @@ export const countBounces = (start: DateTime, end: DateTime, siteId?: string) =>
         .select("session_id", db.raw("count(*) as count"))
         .from("events")
         .where(filterEvents(start, end, siteId))
-        .groupBy("session_id")
+        .groupBy("session_id"),
     )
     .count<any>()
     .from("events_per_session")
@@ -86,7 +86,7 @@ export const countUsers = (start: DateTime, end: DateTime, siteId?: string) =>
 export const countLiveUsers = (
   start: DateTime,
   end: DateTime,
-  siteId?: string
+  siteId?: string,
 ) =>
   db
     .count<any>()
@@ -95,14 +95,14 @@ export const countLiveUsers = (
     .andWhere(
       "last_activity_at",
       ">=",
-      Math.floor(DateTime.now().minus({ minutes: 5 }).toSeconds())
+      Math.floor(DateTime.now().minus({ minutes: 5 }).toSeconds()),
     )
     .then((rows) => rows[0]["count(*)"]);
 
 export const averageSessionDuration = (
   start: DateTime,
   end: DateTime,
-  siteId?: string
+  siteId?: string,
 ) =>
   db
     .select(db.raw("avg(last_activity_at - started_at) as avg"))
@@ -116,7 +116,7 @@ export const topByColumn = (
   start: DateTime,
   end: DateTime,
   siteId?: string,
-  limit = 10
+  limit = 10,
 ) =>
   db
     .with(
@@ -126,7 +126,7 @@ export const topByColumn = (
         .from("events")
         .where(filterEvents(start, end, siteId))
         .whereNull("name")
-        .groupBy(column)
+        .groupBy(column),
     )
     .select()
     .from("top")
@@ -137,7 +137,7 @@ export const topDeviceTypes = (
   start: DateTime,
   end: DateTime,
   siteId?: string,
-  limit = 10
+  limit = 10,
 ) =>
   db
     .with(
@@ -147,15 +147,15 @@ export const topDeviceTypes = (
         .select(
           db.raw(`
             case
-              when screen_width < 600 then "Mobile"
-              when screen_width < 1025 then "Tablet"
-              else "Desktop"
+              when screen_width < 600 then 'Mobile'
+              when screen_width < 1025 then 'Tablet'
+              else 'Desktop'
             end as device
-          `)
+          `),
         )
         .from("events")
         .where(filterEvents(start, end, siteId))
-        .whereNull("name")
+        .whereNull("name"),
     )
     .select("device", db.raw("count(*) as count"))
     .from("devices")
