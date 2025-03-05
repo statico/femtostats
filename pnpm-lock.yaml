@@ -21,7 +21,7 @@ importers:
         specifier: 0.1.1
         version: 0.1.1
       better-sqlite3:
-        specifier: ^11.8.1
+        specifier: 11.8.1
         version: 11.8.1
       chart.js:
         specifier: 4.4.3
