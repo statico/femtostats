@@ -29,7 +29,7 @@ exports.up = async (knex) => {
     })
     .createTable("sessions", (t) => {
       t.text("id").primary();
-      t.integer("site_id").references("site.id").index();
+      t.integer("site_id").references("sites.id").index();
       t.text("user_id");
       t.integer("started_at").index();
       t.integer("last_activity_at").index();

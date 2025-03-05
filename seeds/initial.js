@@ -145,6 +145,6 @@ exports.seed = async function (knex) {
   }
 
   await knex.batchInsert("sites", SITES, 100);
-  await knex.batchInsert("events", events, 100);
   await knex.batchInsert("sessions", sessions, 100);
+  await knex.batchInsert("events", events, 100);
 };
