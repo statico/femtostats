@@ -86,7 +86,7 @@ const track = async (req: NextApiRequest) => {
     console.error(
       `Hostname ${JSON.stringify(hostname)} does not match site ${
         site.id
-      }'s hostnames ${JSON.stringify(site.hostname)}`
+      }'s hostnames ${JSON.stringify(site.hostname)}`,
     );
     return;
   }
@@ -99,6 +99,19 @@ const track = async (req: NextApiRequest) => {
     req.socket.remoteAddress;
   const country = ip ? await getCountryForIP(ip) : null;
   const now = Math.floor(Date.now() / 1000);
+
+  if (sessionId) {
+    await db("sessions")
+      .insert({
+        id: sessionId,
+        site_id: site.id,
+        user_id: userId,
+        started_at: now,
+        last_activity_at: now,
+      })
+      .onConflict(["id"])
+      .merge(["last_activity_at"]);
+  }
 
   await db("events").insert({
     timestamp: now,
@@ -115,17 +128,4 @@ const track = async (req: NextApiRequest) => {
     screen_width: Number(screenWidth),
     country,
   });
-
-  if (sessionId) {
-    await db("sessions")
-      .insert({
-        id: sessionId,
-        site_id: site.id,
-        user_id: userId,
-        started_at: now,
-        last_activity_at: now,
-      })
-      .onConflict(["id"])
-      .merge(["last_activity_at"]);
-  }
 };
