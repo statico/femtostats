@@ -1,5 +1,6 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, Toaster, defaultSystem } from "@chakra-ui/react";
 import { ChartJSDefaults } from "components/ChartJSDefaults";
+import { ColorModeProvider } from "hooks/useColorMode";
 import { theme } from "lib/theme";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
@@ -38,25 +39,28 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <link rel="apple-touch-icon" href="/favicon.png" />
         <link rel="icon" sizes="256x256" href="/favicon.png" />
       </Head>
-      <ChakraProvider resetCSS theme={theme}>
-        <SWRConfig value={{ fetcher }}>
-          <RecoilRoot>
-            <RecoilURLSyncJSON
-              location={{ part: "queryParams" }}
-              // SSR: https://github.com/facebookexperimental/Recoil/issues/1777
-              browserInterface={{
-                getURL: () => {
-                  return typeof window === "undefined"
-                    ? `http://localhost:3001${router.route}`
-                    : window.location.href;
-                },
-              }}
-            >
-              <ChartJSDefaults />
-              {getLayout(<Component {...pageProps} />)}
-            </RecoilURLSyncJSON>
-          </RecoilRoot>
-        </SWRConfig>
+      <ChakraProvider value={defaultSystem}>
+        <ColorModeProvider>
+          <SWRConfig value={{ fetcher }}>
+            <RecoilRoot>
+              <RecoilURLSyncJSON
+                location={{ part: "queryParams" }}
+                // SSR: https://github.com/facebookexperimental/Recoil/issues/1777
+                browserInterface={{
+                  getURL: () => {
+                    return typeof window === "undefined"
+                      ? `http://localhost:3001${router.route}`
+                      : window.location.href;
+                  },
+                }}
+              >
+                <ChartJSDefaults />
+                {typeof window !== "undefined" && <Toaster />}
+                {getLayout(<Component {...pageProps} />)}
+              </RecoilURLSyncJSON>
+            </RecoilRoot>
+          </SWRConfig>
+        </ColorModeProvider>
       </ChakraProvider>
     </>
   );

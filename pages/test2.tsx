@@ -7,7 +7,11 @@ export default function Page() {
     <Container>
       <Heading>Other Page</Heading>
       <Link href="/test">Go Back</Link>
-      <Script defer src="/data.js" data-token="aaa" />
+      <Script defer src="/data.js" />
     </Container>
   );
 }
+
+export const getServerSideProps = () => {
+  return { props: {} };
+};

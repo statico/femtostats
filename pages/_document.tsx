@@ -1,5 +1,4 @@
-import { ColorModeScript } from "@chakra-ui/react";
-import { theme } from "lib/theme";
+// ColorModeScript is not needed in Chakra UI v3 as we handle color mode via ColorModeProvider
 import NextDocument, { Head, Html, Main, NextScript } from "next/document";
 
 export default class Document extends NextDocument {
@@ -8,7 +7,6 @@ export default class Document extends NextDocument {
       <Html lang="en">
         <Head />
         <body>
-          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Main />
           <NextScript />
         </body>

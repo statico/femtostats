@@ -5,7 +5,7 @@ import Script from "next/script";
 export default function Page() {
   return (
     <Container>
-      <Stack spacing={10}>
+      <Stack gap={10}>
         <Heading>Test Events</Heading>
         <Button
           onClick={() => {
@@ -18,7 +18,11 @@ export default function Page() {
         <Link href="/test2">Go to Test 2</Link>
         <Link href="https://www.example.com/">Leave Site</Link>
       </Stack>
-      <Script defer src="/data.js" data-token="aaa" />
+      <Script defer src="/data.js" />
     </Container>
   );
 }
+
+export const getServerSideProps = () => {
+  return { props: {} };
+};

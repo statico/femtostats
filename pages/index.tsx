@@ -4,24 +4,24 @@ import {
   GridItem,
   HStack,
   IconButton,
-  Select,
+  NativeSelect,
   Skeleton,
   SkeletonText,
   Stack,
   Stat,
-  StatArrow,
+  StatDownIndicator,
   StatHelpText,
   StatLabel,
-  StatNumber,
+  StatUpIndicator,
+  StatValueText,
   Table,
-  Tbody,
-  Td,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
   Text,
-  Th,
-  Thead,
-  Tr,
-  useColorModeValue,
 } from "@chakra-ui/react";
+import { useColorModeValue } from "hooks/useColorModeValue";
 import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
@@ -76,10 +76,11 @@ export default function Page() {
             <SiteSelector />
             <IconButton
               variant="ghost"
-              icon={<MdSettings />}
               onClick={SiteEditor.show}
               aria-label={"Show site editor"}
-            />
+            >
+              <MdSettings />
+            </IconButton>
           </HStack>
         </GridItem>
         <GridItem display="flex" justifyContent="flex-end">
@@ -116,10 +117,15 @@ Page.getLayout = (page: ReactElement) => {
   return <DefaultLayout title="Dashboard">{page}</DefaultLayout>;
 };
 
+// Make page dynamic to avoid SSR issues with Chakra UI v3
+export const getServerSideProps = () => {
+  return { props: {} };
+};
+
 const Card = ({ children }: { children: ReactNode }) => {
   const bg = useColorModeValue("gray.100", "gray.700");
   return (
-    <Stack spacing={4} borderRadius="lg" bg={bg} p={4}>
+    <Stack gap={4} borderRadius="lg" bg={bg} p={4}>
       {children}
     </Stack>
   );
@@ -129,43 +135,45 @@ const SiteSelector = () => {
   const [view, setView] = useRecoilState(viewState);
   const { data } = useSWR("/api/stats/sites/list");
   return (
-    <Select
-      maxW="xs"
-      value={view.siteId}
-      onChange={(e) => {
-        const siteId = Number(e.target.value) || undefined;
-        setView({ ...view, siteId });
-      }}
-    >
-      <option>All Sites</option>
-      {data &&
-        data.sites.map((site: any) => (
-          <option key={site.id} value={site.id}>
-            {site.name}
-          </option>
-        ))}
-    </Select>
+    <NativeSelect.Root maxW="xs">
+      <NativeSelect.Field
+        value={String(view.siteId || "")}
+        onChange={(e) => {
+          const siteId = Number(e.target.value) || undefined;
+          setView({ ...view, siteId });
+        }}
+      >
+        <option value="">All Sites</option>
+        {data &&
+          data.sites.map((site: any) => (
+            <option key={site.id} value={site.id}>
+              {site.name}
+            </option>
+          ))}
+      </NativeSelect.Field>
+    </NativeSelect.Root>
   );
 };
 
 const DateRangeSelector = () => {
   const [view, setView] = useRecoilState(viewState);
   return (
-    <Select
-      maxW="xs"
-      defaultValue="31"
-      onChange={(e) => {
-        const days = Number(e.target.value);
-        setView({
-          ...view,
-          start: Math.floor(DateTime.now().minus({ days }).toSeconds()),
-        });
-      }}
-    >
-      <option value="7">Last Week</option>
-      <option value="31">Last Month</option>
-      <option value="90">Last 90 Days</option>
-    </Select>
+    <NativeSelect.Root maxW="xs">
+      <NativeSelect.Field
+        defaultValue="31"
+        onChange={(e) => {
+          const days = Number(e.target.value);
+          setView({
+            ...view,
+            start: Math.floor(DateTime.now().minus({ days }).toSeconds()),
+          });
+        }}
+      >
+        <option value="7">Last Week</option>
+        <option value="31">Last Month</option>
+        <option value="90">Last 90 Days</option>
+      </NativeSelect.Field>
+    </NativeSelect.Root>
   );
 };
 
@@ -177,20 +185,26 @@ const DashboardStat = (props: {
   formatter?: (value: any) => string;
   icon?: ReactNode;
 }) => (
-  <Stat flex="none">
+  <Stat.Root flex="none">
     <StatLabel>{props.title}</StatLabel>
     {props.loading ? (
-      <Stack spacing={2}>
+      <Stack gap={2}>
         <Skeleton mt={2} h={7} w={24} />
         <Skeleton mt={2} h={4} w={16} />
       </Stack>
     ) : (
       <>
-        <StatNumber>{(props.formatter || formatNumber)(props.new)}</StatNumber>
+        <StatValueText>
+          {(props.formatter || formatNumber)(props.new)}
+        </StatValueText>
         <StatHelpText>
           {props.old ? (
             <>
-              <StatArrow type={statType(props.old, props.new)} />
+              {statType(props.old, props.new) === "increase" ? (
+                <StatUpIndicator />
+              ) : (
+                <StatDownIndicator />
+              )}
               {statPercent(props.old, props.new)}
             </>
           ) : props.icon ? (
@@ -201,13 +215,13 @@ const DashboardStat = (props: {
         </StatHelpText>
       </>
     )}
-  </Stat>
+  </Stat.Root>
 );
 
 const DashboardStats = () => {
   const data = useDashboardData();
   return (
-    <HStack spacing={10}>
+    <HStack gap={10}>
       <DashboardStat
         title="Current Visitors"
         loading={!data}
@@ -286,7 +300,7 @@ const PageViewChart = () => {
                 callback: function (val, index) {
                   return index % 2 === 0
                     ? DateTime.fromISO(
-                        this.getLabelForValue(Number(val))
+                        this.getLabelForValue(Number(val)),
                       ).toFormat("ccc, d LLL")
                     : "";
                 },
@@ -317,21 +331,21 @@ const TopTable = ({
   return (
     <Card>
       {rows ? (
-        <Table size="sm">
-          <Thead>
-            <Tr>
-              <Th>{title}</Th>
-              <Th isNumeric>Page Views</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+        <Table.Root size="sm">
+          <TableHeader>
+            <TableRow>
+              <TableHeader>{title}</TableHeader>
+              <TableHeader textAlign="end">Page Views</TableHeader>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row: any, index: number) => (
-              <Tr key={index}>
-                <Td
-                  position="relative"
-                  width="66%"
-                  sx={{
-                    _after: {
+              <TableRow key={index}>
+                <TableCell position="relative" width="66%">
+                  <Box
+                    position="relative"
+                    zIndex={1}
+                    _after={{
                       content: '""',
                       position: "absolute",
                       top: 0,
@@ -341,24 +355,22 @@ const TopTable = ({
                       bg,
                       opacity: 0.5,
                       zIndex: 0,
-                    },
-                  }}
-                >
-                  <Box zIndex={1} position="relative">
+                    }}
+                  >
                     {column === "country" ? (
                       <Country code={row.country} />
                     ) : (
                       row[column] || "(none)"
                     )}
                   </Box>
-                </Td>
-                <Td isNumeric>{formatNumber(row.count)}</Td>
-              </Tr>
+                </TableCell>
+                <TableCell textAlign="end">{formatNumber(row.count)}</TableCell>
+              </TableRow>
             ))}
-          </Tbody>
-        </Table>
+          </TableBody>
+        </Table.Root>
       ) : (
-        <SkeletonText spacing={4} noOfLines={10} />
+        <SkeletonText gap={4} noOfLines={10} />
       )}
     </Card>
   );

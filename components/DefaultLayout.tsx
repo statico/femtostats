@@ -9,8 +9,8 @@ import {
   LinkBox,
   LinkOverlay,
   Stack,
-  useColorMode,
 } from "@chakra-ui/react";
+import { useColorMode } from "hooks/useColorMode";
 import Head from "next/head";
 import { ReactNode } from "react";
 import { MdModeNight, MdWbSunny } from "react-icons/md";
@@ -27,7 +27,7 @@ export default function DefaultLayout({ title, children }: Props) {
         <title>{`${title} | Femtostats`}</title>
       </Head>
       <Container maxW="container.xl" py={4}>
-        <Stack spacing={4}>
+        <Stack gap={4}>
           <Flex as="header" justify="space-between">
             <LinkBox>
               <LinkOverlay href="/">
@@ -57,7 +57,6 @@ const ColorModeToggle = () => {
   return (
     <IconButton
       variant="ghost"
-      icon={colorMode === "dark" ? <MdWbSunny /> : <MdModeNight />}
       onClick={() => {
         toggleColorMode();
 
@@ -66,6 +65,8 @@ const ColorModeToggle = () => {
         location.reload();
       }}
       aria-label={"Toggle light/dark mode"}
-    />
+    >
+      {colorMode === "dark" ? <MdWbSunny /> : <MdModeNight />}
+    </IconButton>
   );
 };

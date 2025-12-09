@@ -11,7 +11,8 @@ export function middleware(req: NextRequest) {
 
   const ip =
     singleParam(req.headers.get("x-forwarded-for")).split(",").pop()?.trim() ||
-    req.ip;
+    req.headers.get("x-real-ip") ||
+    "unknown";
 
   try {
     const auth = req.headers.get("authorization") || "";

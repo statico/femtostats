@@ -101,7 +101,7 @@ const track = async (req: NextApiRequest) => {
   const now = Math.floor(Date.now() / 1000);
 
   if (sessionId) {
-    await db("sessions")
+    await db
       .insert({
         id: sessionId,
         site_id: site.id,
@@ -109,23 +109,26 @@ const track = async (req: NextApiRequest) => {
         started_at: now,
         last_activity_at: now,
       })
+      .into("sessions")
       .onConflict(["id"])
       .merge(["last_activity_at"]);
   }
 
-  await db("events").insert({
-    timestamp: now,
-    site_id: site.id,
-    session_id: sessionId,
-    name,
-    hostname,
-    pathname,
-    referrer: referrerHostname,
-    os: ua.os.name,
-    os_version: ua.os.version,
-    browser: ua.browser.name,
-    browser_version: ua.browser.version,
-    screen_width: Number(screenWidth),
-    country,
-  });
+  await db
+    .insert({
+      timestamp: now,
+      site_id: site.id,
+      session_id: sessionId,
+      name,
+      hostname,
+      pathname,
+      referrer: referrerHostname,
+      os: ua.os.name,
+      os_version: ua.os.version,
+      browser: ua.browser.name,
+      browser_version: ua.browser.version,
+      screen_width: Number(screenWidth),
+      country,
+    })
+    .into("events");
 };
