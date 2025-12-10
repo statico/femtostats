@@ -1,11 +1,20 @@
-import { singleParam } from "lib/misc";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 const HARDCODED_USERNAME = "admin";
 
+// Helper function to extract single parameter value
+const singleParam = (
+  value: string | string[] | number | undefined | null,
+): string => {
+  if (value == null) return "";
+  if (Array.isArray(value)) return value[0] || "";
+  if (typeof value === "number") return String(value);
+  return value || "";
+};
+
 // Very simple HTTP Basic auth with a hardcoded username.
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const secret = process.env.PASSWORD;
   if (!secret) return NextResponse.next();
 
