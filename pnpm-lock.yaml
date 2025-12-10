@@ -17,9 +17,6 @@ importers:
       '@emotion/styled':
         specifier: 11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react@19.2.1)
-      '@recoiljs/refine':
-        specifier: 0.1.1
-        version: 0.1.1
       better-sqlite3:
         specifier: 12.5.0
         version: 12.5.0
@@ -71,12 +68,6 @@ importers:
       react-world-flags:
         specifier: 1.6.0
         version: 1.6.0(react@19.2.1)
-      recoil:
-        specifier: 0.7.7
-        version: 0.7.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      recoil-sync:
-        specifier: 0.2.0
-        version: 0.2.0(recoil@0.7.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1))
       swr:
         specifier: 2.3.7
         version: 2.3.7(react@19.2.1)
@@ -95,6 +86,9 @@ importers:
       yup:
         specifier: 1.7.1
         version: 1.7.1
+      zustand:
+        specifier: ^5.0.9
+        version: 5.0.9(@types/react@19.2.7)(react@19.2.1)(use-sync-external-store@1.6.0(react@19.2.1))
     devDependencies:
       '@types/chart.js':
         specifier: 4.0.1
@@ -474,9 +468,6 @@ packages:
 
   '@pandacss/is-valid-prop@1.7.0':
     resolution: {integrity: sha512-KRvJtXYK+ffbEZfTpNecytjvwwQanzvTfgeZXUKnhzoVmU2m9qYhK4XILZtFwpZoiaHpgYfv+OhLcjTD/1Yqgg==}
-
-  '@recoiljs/refine@0.1.1':
-    resolution: {integrity: sha512-ry02rHswJePYkH1o8K99qL4O6TBntF9/g7W5wXVwaOUrIJEZUGfl/I3+btPXbUgyyEZvNs5xcwvOw13AufmFQw==}
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -1030,9 +1021,6 @@ packages:
   glob-to-regexp@0.4.1:
     resolution: {integrity: sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==}
 
-  hamt_plus@1.0.2:
-    resolution: {integrity: sha512-t2JXKaehnMb9paaYA7J0BX8QQAY8lwfQ9Gjf4pg/mk4krt+cmwmU652HOoWonf+7+EQV97ARPMhhVgU1ra2GhA==}
-
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
@@ -1348,23 +1336,6 @@ packages:
     resolution: {integrity: sha512-/vxpCXddiX8NGfGO/mTafwjq4aFa/71pvamip0++IQk3zG8cbCj0fifNPrjjF1XMXUne91jL9OoxmdykoEtifQ==}
     engines: {node: '>= 10.13.0'}
 
-  recoil-sync@0.2.0:
-    resolution: {integrity: sha512-ZYZM1C4LAhGr3EeMMI5MwT4eaEqsr+ddjB4EwdgN8HXXLmE7P5FVCdFHV3HJtMzxR3Y8sOmJDfN1IPrezwKoRg==}
-    peerDependencies:
-      recoil: '>=0.7.3'
-
-  recoil@0.7.7:
-    resolution: {integrity: sha512-8Og5KPQW9LwC577Vc7Ug2P0vQshkv1y3zG3tSSkWMqkWSwHmE+by06L8JtnGocjW6gcCvfwB3YtrJG6/tWivNQ==}
-    peerDependencies:
-      react: '>=16.13.1'
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
-
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
@@ -1523,10 +1494,6 @@ packages:
   toposort@2.0.2:
     resolution: {integrity: sha512-0a5EOkAUp8D4moMi2W8ZF8jcga7BgZd91O/yabJCFY8az+XSzeGyTKs0Aoo897iV1Nj6guFq8orWDS96z91oGg==}
 
-  transit-js@0.8.874:
-    resolution: {integrity: sha512-IDJJGKRzUbJHmN0P15HBBa05nbKor3r2MmG6aSt0UxXIlJZZKcddTk67/U7WyAeW9Hv/VYI02IqLzolsC4sbPA==}
-    engines: {node: '>= 0.10.0'}
-
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -1596,6 +1563,24 @@ packages:
 
   yup@1.7.1:
     resolution: {integrity: sha512-GKHFX2nXul2/4Dtfxhozv701jLQHdf6J34YDh2cEkpqoo8le5Mg6/LrdseVLrFarmFygZTlfIhHx/QKfb/QWXw==}
+
+  zustand@5.0.9:
+    resolution: {integrity: sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
 
 snapshots:
 
@@ -1983,8 +1968,6 @@ snapshots:
     optional: true
 
   '@pandacss/is-valid-prop@1.7.0': {}
-
-  '@recoiljs/refine@0.1.1': {}
 
   '@swc/helpers@0.5.15':
     dependencies:
@@ -2791,8 +2774,6 @@ snapshots:
 
   glob-to-regexp@0.4.1: {}
 
-  hamt_plus@1.0.2: {}
-
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
@@ -3089,19 +3070,6 @@ snapshots:
     dependencies:
       resolve: 1.22.11
 
-  recoil-sync@0.2.0(recoil@0.7.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1)):
-    dependencies:
-      '@recoiljs/refine': 0.1.1
-      recoil: 0.7.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      transit-js: 0.8.874
-
-  recoil@0.7.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
-    dependencies:
-      hamt_plus: 1.0.2
-      react: 19.2.1
-    optionalDependencies:
-      react-dom: 19.2.1(react@19.2.1)
-
   resolve-from@4.0.0: {}
 
   resolve-from@5.0.0: {}
@@ -3283,8 +3251,6 @@ snapshots:
 
   toposort@2.0.2: {}
 
-  transit-js@0.8.874: {}
-
   tslib@2.8.1: {}
 
   tunnel-agent@0.6.0:
@@ -3339,3 +3305,9 @@ snapshots:
       tiny-case: 1.0.3
       toposort: 2.0.2
       type-fest: 2.19.0
+
+  zustand@5.0.9(@types/react@19.2.7)(react@19.2.1)(use-sync-external-store@1.6.0(react@19.2.1)):
+    optionalDependencies:
+      '@types/react': 19.2.7
+      react: 19.2.1
+      use-sync-external-store: 1.6.0(react@19.2.1)

@@ -5,10 +5,7 @@ import { theme } from "lib/theme";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { ReactElement, ReactNode } from "react";
-import { RecoilRoot } from "recoil";
-import { RecoilURLSyncJSON } from "recoil-sync";
 import { SWRConfig } from "swr";
 import fetch from "isomorphic-unfetch";
 
@@ -30,7 +27,6 @@ const fetcher = async (resource: string, init: any) => {
 };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const router = useRouter();
   const getLayout = Component.getLayout ?? ((page) => page);
   return (
     <>
@@ -42,23 +38,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <ChakraProvider value={defaultSystem}>
         <ColorModeProvider>
           <SWRConfig value={{ fetcher }}>
-            <RecoilRoot>
-              <RecoilURLSyncJSON
-                location={{ part: "queryParams" }}
-                // SSR: https://github.com/facebookexperimental/Recoil/issues/1777
-                browserInterface={{
-                  getURL: () => {
-                    return typeof window === "undefined"
-                      ? `http://localhost:3001${router.route}`
-                      : window.location.href;
-                  },
-                }}
-              >
-                <ChartJSDefaults />
-                {typeof window !== "undefined" && <Toaster />}
-                {getLayout(<Component {...pageProps} />)}
-              </RecoilURLSyncJSON>
-            </RecoilRoot>
+            <ChartJSDefaults />
+            {typeof window !== "undefined" && <Toaster />}
+            {getLayout(<Component {...pageProps} />)}
           </SWRConfig>
         </ColorModeProvider>
       </ChakraProvider>

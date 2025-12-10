@@ -19,7 +19,6 @@
     "@chakra-ui/react": "3.30.0",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
-    "@recoiljs/refine": "0.1.1",
     "better-sqlite3": "12.5.0",
     "chart.js": "4.5.1",
     "dotenv": "17.2.3",
@@ -37,14 +36,13 @@
     "react-dom": "19.2.1",
     "react-icons": "5.5.0",
     "react-world-flags": "1.6.0",
-    "recoil": "0.7.7",
-    "recoil-sync": "0.2.0",
     "swr": "2.3.7",
     "tar-stream": "^3.1.7",
     "ua-parser-js": "2.0.7",
     "uglify-js": "3.19.3",
     "unfetch": "5.0.0",
-    "yup": "1.7.1"
+    "yup": "1.7.1",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@types/chart.js": "4.0.1",

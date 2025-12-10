@@ -17,32 +17,10 @@ import {
   useClipboard,
 } from "@chakra-ui/react";
 import { post } from "lib/misc";
+import { useCurrentSiteStore, useShowSiteEditorStore } from "lib/stores";
 import { useEffect, useState } from "react";
 import { MdAdd, MdFileCopy } from "react-icons/md";
-import { atom, useRecoilState, useResetRecoilState } from "recoil";
 import useSWR from "swr";
-
-type SiteState = {
-  id?: number;
-  name: string;
-  hostnames: string;
-  token?: string;
-};
-
-const currentSiteState = atom<SiteState>({
-  key: "currentSite",
-  default: {
-    id: undefined,
-    name: "",
-    hostnames: "",
-    token: undefined,
-  },
-});
-
-const showSiteEditorState = atom<boolean>({
-  key: "showSiteEditor",
-  default: false,
-});
 
 const toaster = createToaster({
   placement: "top",
@@ -50,7 +28,7 @@ const toaster = createToaster({
 });
 
 const SiteEditorModal = () => {
-  const [showEditor, setShowEditor] = useRecoilState(showSiteEditorState);
+  const { showEditor, setShowEditor } = useShowSiteEditorStore();
 
   return (
     <DialogRoot
@@ -81,8 +59,14 @@ const SiteEditorModal = () => {
 };
 
 const SiteList = () => {
-  const [current, setCurrent] = useRecoilState(currentSiteState);
-  const resetCurrent = useResetRecoilState(currentSiteState);
+  const current = useCurrentSiteStore((state) => ({
+    id: state.id,
+    name: state.name,
+    hostnames: state.hostnames,
+    token: state.token,
+  }));
+  const setCurrent = useCurrentSiteStore((state) => state.setCurrent);
+  const resetCurrent = useCurrentSiteStore((state) => state.resetCurrent);
   const { data } = useSWR("/api/stats/sites/list");
 
   return (
@@ -95,7 +79,7 @@ const SiteList = () => {
           w="full"
           justifyContent="flex-start"
           onClick={() => {
-            setCurrent(site);
+            setCurrent(site as any);
           }}
         >
           {site.name}
@@ -116,14 +100,20 @@ const SiteList = () => {
 };
 
 const SiteEditor = () => {
-  const [site, setSite] = useRecoilState(currentSiteState);
-  const resetCurrent = useResetRecoilState(currentSiteState);
+  const site = useCurrentSiteStore((state) => ({
+    id: state.id,
+    name: state.name,
+    hostnames: state.hostnames,
+    token: state.token,
+  }));
+  const setCurrent = useCurrentSiteStore((state) => state.setCurrent);
+  const resetCurrent = useCurrentSiteStore((state) => state.resetCurrent);
   const { data, mutate } = useSWR("/api/stats/sites/list");
 
   const [reallyDelete, setReallyDelete] = useState(false);
   useEffect(() => {
     setReallyDelete(false);
-  }, [site]);
+  }, [site.id]);
 
   const [tag, setTag] = useState("");
   useEffect(() => {
@@ -140,7 +130,7 @@ const SiteEditor = () => {
       const result = await post("/api/stats/sites/create", site);
       mutate();
       toaster.create({ title: `${site.name} created`, type: "success" });
-      setSite(result);
+      setCurrent(result);
     } catch (err) {
       toaster.create({ title: String(err), type: "error" });
     }
@@ -151,7 +141,7 @@ const SiteEditor = () => {
       const result = await post("/api/stats/sites/update", site);
       mutate();
       toaster.create({ title: `${site.name} updated`, type: "success" });
-      setSite(result);
+      setCurrent(result);
     } catch (err) {
       toaster.create({ title: String(err), type: "error" });
     }
@@ -164,7 +154,7 @@ const SiteEditor = () => {
       toaster.create({ title: `${site.name} deleted`, type: "success" });
       if (data?.sites?.length > 1) {
         // Can't wait for mutate
-        setSite(data.sites.find((s: any) => s.id !== site.id));
+        setCurrent(data.sites.find((s: any) => s.id !== site.id));
       } else {
         resetCurrent();
       }
@@ -182,7 +172,7 @@ const SiteEditor = () => {
           placeholder="My Awesome Site"
           value={site.name}
           onChange={(e) => {
-            setSite({
+            setCurrent({
               ...site,
               name: e.target.value,
             });
@@ -198,7 +188,7 @@ const SiteEditor = () => {
           value={site.hostnames}
           size="md"
           onChange={(e) => {
-            setSite({
+            setCurrent({
               ...site,
               hostnames: e.target.value,
             });
@@ -279,9 +269,15 @@ const SiteEditor = () => {
 };
 
 export const useSiteEditor = () => {
-  const [showEditor, setShowEditor] = useRecoilState(showSiteEditorState);
+  const { setShowEditor } = useShowSiteEditorStore();
   const { data } = useSWR("/api/stats/sites/list");
-  const [current, setCurrent] = useRecoilState(currentSiteState);
+  const current = useCurrentSiteStore((state) => ({
+    id: state.id,
+    name: state.name,
+    hostnames: state.hostnames,
+    token: state.token,
+  }));
+  const setCurrent = useCurrentSiteStore((state) => state.setCurrent);
 
   return {
     Component: SiteEditorModal,

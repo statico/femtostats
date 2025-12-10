@@ -22,41 +22,26 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "hooks/useColorModeValue";
-import { CheckerReturnType, number, object, optional } from "@recoiljs/refine";
 import "chart.js/auto";
 import DefaultLayout from "components/DefaultLayout";
 import { useSiteEditor } from "components/SiteEditor";
 import { useBufferedValue } from "hooks/useBufferedValue";
 import { formatNumber, statPercent, statType, toURL } from "lib/misc";
+import { useViewStore, type ViewState } from "lib/stores";
 import { DateTime, Duration } from "luxon";
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, useEffect } from "react";
 import { Chart } from "react-chartjs-2";
 import { MdPerson, MdSettings } from "react-icons/md";
-import { atom, useRecoilState, useRecoilValue } from "recoil";
-import { syncEffect } from "recoil-sync";
+import { useRouter } from "next/router";
 import useSWR from "swr";
 import { Country } from "../components/Country";
 
-const viewChecker = object({
-  siteId: optional(number()),
-  start: optional(number()),
-  end: optional(number()),
-});
-
-type ViewState = CheckerReturnType<typeof viewChecker>;
-
-const viewState = atom<ViewState>({
-  key: "view",
-  default: {
-    siteId: undefined,
-    start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
-    end: Math.floor(DateTime.now().toSeconds()),
-  },
-  effects: [syncEffect({ refine: viewChecker })],
-});
-
 const useDashboardData = () => {
-  const view = useRecoilValue(viewState);
+  const view = useViewStore((state) => ({
+    siteId: state.siteId,
+    start: state.start,
+    end: state.end,
+  }));
   const { data: raw } = useSWR(toURL("/api/stats/dashboard", view), {
     refreshInterval: 60000,
   });
@@ -66,6 +51,83 @@ const useDashboardData = () => {
 
 export default function Page() {
   const SiteEditor = useSiteEditor();
+  const router = useRouter();
+  const view = useViewStore((state) => ({
+    siteId: state.siteId,
+    start: state.start,
+    end: state.end,
+  }));
+  const setView = useViewStore((state) => state.setView);
+
+  // Sync URL query params with store on mount and when query changes (from browser navigation)
+  useEffect(() => {
+    if (router.isReady) {
+      const { siteId, start, end } = router.query;
+      const newView: Partial<ViewState> = {};
+      if (siteId !== undefined) {
+        if (siteId === "") {
+          newView.siteId = undefined;
+        } else {
+          const parsed = Number(siteId);
+          if (!Number.isNaN(parsed)) newView.siteId = parsed;
+        }
+      }
+      if (start !== undefined) {
+        const parsed = Number(start);
+        if (!Number.isNaN(parsed)) newView.start = parsed;
+      }
+      if (end !== undefined) {
+        const parsed = Number(end);
+        if (!Number.isNaN(parsed)) newView.end = parsed;
+      }
+      // Only update if there are actual changes to avoid loops
+      if (Object.keys(newView).length > 0) {
+        const currentView = useViewStore.getState();
+        const hasChanges =
+          newView.siteId !== currentView.siteId ||
+          newView.start !== currentView.start ||
+          newView.end !== currentView.end;
+        if (hasChanges) {
+          setView(newView);
+        }
+      }
+    }
+  }, [router.isReady, router.query, setView]);
+
+  // Sync store changes to URL (when user interacts with UI)
+  useEffect(() => {
+    if (router.isReady) {
+      const query: Record<string, string> = {};
+      if (view.siteId !== undefined) query.siteId = String(view.siteId);
+      if (view.start !== undefined) query.start = String(view.start);
+      if (view.end !== undefined) query.end = String(view.end);
+
+      const currentQuery = router.query;
+      const needsUpdate =
+        String(currentQuery.siteId || "") !== String(query.siteId || "") ||
+        String(currentQuery.start || "") !== String(query.start || "") ||
+        String(currentQuery.end || "") !== String(query.end || "");
+
+      if (needsUpdate) {
+        router.replace(
+          {
+            pathname: router.pathname,
+            query: { ...currentQuery, ...query },
+          },
+          undefined,
+          { shallow: true },
+        );
+      }
+    }
+  }, [
+    view.siteId,
+    view.start,
+    view.end,
+    router.isReady,
+    router.pathname,
+    router.query,
+    router.replace,
+  ]);
 
   return (
     <>
@@ -132,7 +194,12 @@ const Card = ({ children }: { children: ReactNode }) => {
 };
 
 const SiteSelector = () => {
-  const [view, setView] = useRecoilState(viewState);
+  const view = useViewStore((state) => ({
+    siteId: state.siteId,
+    start: state.start,
+    end: state.end,
+  }));
+  const setView = useViewStore((state) => state.setView);
   const { data } = useSWR("/api/stats/sites/list");
   return (
     <NativeSelect.Root maxW="xs">
@@ -140,7 +207,7 @@ const SiteSelector = () => {
         value={String(view.siteId || "")}
         onChange={(e) => {
           const siteId = Number(e.target.value) || undefined;
-          setView({ ...view, siteId });
+          setView({ siteId });
         }}
       >
         <option value="">All Sites</option>
@@ -156,7 +223,7 @@ const SiteSelector = () => {
 };
 
 const DateRangeSelector = () => {
-  const [view, setView] = useRecoilState(viewState);
+  const setView = useViewStore((state) => state.setView);
   return (
     <NativeSelect.Root maxW="xs">
       <NativeSelect.Field
@@ -164,7 +231,6 @@ const DateRangeSelector = () => {
         onChange={(e) => {
           const days = Number(e.target.value);
           setView({
-            ...view,
             start: Math.floor(DateTime.now().minus({ days }).toSeconds()),
           });
         }}
