@@ -122,7 +122,7 @@ const SiteEditor = () => {
         `<script src="${location.origin}/data.js" data-token="${site.token}" defer></script>`,
       );
     }
-  });
+  }, [site.token]);
   const { onCopy, hasCopied } = useClipboard(tag);
 
   const handleCreate = async () => {

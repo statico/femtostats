@@ -1,13 +1,13 @@
-import { ChakraProvider, Toaster, defaultSystem } from "@chakra-ui/react";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { ChartJSDefaults } from "components/ChartJSDefaults";
 import { ColorModeProvider } from "hooks/useColorMode";
-import { theme } from "lib/theme";
-import { NextPage } from "next";
-import { AppProps } from "next/app";
+import type { NextPage } from "next";
+import type { AppProps } from "next/app";
 import Head from "next/head";
-import { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { SWRConfig } from "swr";
 import fetch from "isomorphic-unfetch";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -37,11 +37,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       </Head>
       <ChakraProvider value={defaultSystem}>
         <ColorModeProvider>
-          <SWRConfig value={{ fetcher }}>
-            <ChartJSDefaults />
-            {typeof window !== "undefined" && <Toaster />}
-            {getLayout(<Component {...pageProps} />)}
-          </SWRConfig>
+          <NuqsAdapter>
+            <SWRConfig value={{ fetcher }}>
+              <ChartJSDefaults />
+              {getLayout(<Component {...pageProps} />)}
+            </SWRConfig>
+          </NuqsAdapter>
         </ColorModeProvider>
       </ChakraProvider>
     </>

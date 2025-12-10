@@ -27,21 +27,19 @@ import DefaultLayout from "components/DefaultLayout";
 import { useSiteEditor } from "components/SiteEditor";
 import { useBufferedValue } from "hooks/useBufferedValue";
 import { formatNumber, statPercent, statType, toURL } from "lib/misc";
-import { useViewStore, type ViewState } from "lib/stores";
 import { DateTime, Duration } from "luxon";
-import { ReactElement, ReactNode, useEffect } from "react";
+import { ReactElement, ReactNode } from "react";
 import { Chart } from "react-chartjs-2";
 import { MdPerson, MdSettings } from "react-icons/md";
-import { useRouter } from "next/router";
 import useSWR from "swr";
 import { Country } from "../components/Country";
+import { useQueryStates, parseAsInteger } from "nuqs";
 
-const useDashboardData = () => {
-  const view = useViewStore((state) => ({
-    siteId: state.siteId,
-    start: state.start,
-    end: state.end,
-  }));
+const useDashboardData = (view: {
+  siteId?: number;
+  start?: number;
+  end?: number;
+}) => {
   const { data: raw } = useSWR(toURL("/api/stats/dashboard", view), {
     refreshInterval: 60000,
   });
@@ -51,83 +49,6 @@ const useDashboardData = () => {
 
 export default function Page() {
   const SiteEditor = useSiteEditor();
-  const router = useRouter();
-  const view = useViewStore((state) => ({
-    siteId: state.siteId,
-    start: state.start,
-    end: state.end,
-  }));
-  const setView = useViewStore((state) => state.setView);
-
-  // Sync URL query params with store on mount and when query changes (from browser navigation)
-  useEffect(() => {
-    if (router.isReady) {
-      const { siteId, start, end } = router.query;
-      const newView: Partial<ViewState> = {};
-      if (siteId !== undefined) {
-        if (siteId === "") {
-          newView.siteId = undefined;
-        } else {
-          const parsed = Number(siteId);
-          if (!Number.isNaN(parsed)) newView.siteId = parsed;
-        }
-      }
-      if (start !== undefined) {
-        const parsed = Number(start);
-        if (!Number.isNaN(parsed)) newView.start = parsed;
-      }
-      if (end !== undefined) {
-        const parsed = Number(end);
-        if (!Number.isNaN(parsed)) newView.end = parsed;
-      }
-      // Only update if there are actual changes to avoid loops
-      if (Object.keys(newView).length > 0) {
-        const currentView = useViewStore.getState();
-        const hasChanges =
-          newView.siteId !== currentView.siteId ||
-          newView.start !== currentView.start ||
-          newView.end !== currentView.end;
-        if (hasChanges) {
-          setView(newView);
-        }
-      }
-    }
-  }, [router.isReady, router.query, setView]);
-
-  // Sync store changes to URL (when user interacts with UI)
-  useEffect(() => {
-    if (router.isReady) {
-      const query: Record<string, string> = {};
-      if (view.siteId !== undefined) query.siteId = String(view.siteId);
-      if (view.start !== undefined) query.start = String(view.start);
-      if (view.end !== undefined) query.end = String(view.end);
-
-      const currentQuery = router.query;
-      const needsUpdate =
-        String(currentQuery.siteId || "") !== String(query.siteId || "") ||
-        String(currentQuery.start || "") !== String(query.start || "") ||
-        String(currentQuery.end || "") !== String(query.end || "");
-
-      if (needsUpdate) {
-        router.replace(
-          {
-            pathname: router.pathname,
-            query: { ...currentQuery, ...query },
-          },
-          undefined,
-          { shallow: true },
-        );
-      }
-    }
-  }, [
-    view.siteId,
-    view.start,
-    view.end,
-    router.isReady,
-    router.pathname,
-    router.query,
-    router.replace,
-  ]);
 
   return (
     <>
@@ -194,12 +115,9 @@ const Card = ({ children }: { children: ReactNode }) => {
 };
 
 const SiteSelector = () => {
-  const view = useViewStore((state) => ({
-    siteId: state.siteId,
-    start: state.start,
-    end: state.end,
-  }));
-  const setView = useViewStore((state) => state.setView);
+  const [view, setView] = useQueryStates({
+    siteId: parseAsInteger,
+  });
   const { data } = useSWR("/api/stats/sites/list");
   return (
     <NativeSelect.Root maxW="xs">
@@ -207,7 +125,7 @@ const SiteSelector = () => {
         value={String(view.siteId || "")}
         onChange={(e) => {
           const siteId = Number(e.target.value) || undefined;
-          setView({ siteId });
+          setView({ siteId: siteId ?? null });
         }}
       >
         <option value="">All Sites</option>
@@ -223,7 +141,10 @@ const SiteSelector = () => {
 };
 
 const DateRangeSelector = () => {
-  const setView = useViewStore((state) => state.setView);
+  const [, setView] = useQueryStates({
+    start: parseAsInteger,
+    end: parseAsInteger,
+  });
   return (
     <NativeSelect.Root maxW="xs">
       <NativeSelect.Field
@@ -232,6 +153,7 @@ const DateRangeSelector = () => {
           const days = Number(e.target.value);
           setView({
             start: Math.floor(DateTime.now().minus({ days }).toSeconds()),
+            end: Math.floor(DateTime.now().toSeconds()),
           });
         }}
       >
@@ -285,7 +207,20 @@ const DashboardStat = (props: {
 );
 
 const DashboardStats = () => {
-  const data = useDashboardData();
+  const [view] = useQueryStates(
+    {
+      siteId: parseAsInteger,
+      start: parseAsInteger,
+      end: parseAsInteger,
+    },
+    {
+      defaultValue: {
+        start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
+        end: Math.floor(DateTime.now().toSeconds()),
+      },
+    },
+  );
+  const data = useDashboardData(view);
   return (
     <HStack gap={10}>
       <DashboardStat
@@ -335,7 +270,20 @@ const DashboardStats = () => {
 };
 
 const PageViewChart = () => {
-  const data = useDashboardData()?.pageviewsByDay;
+  const [view] = useQueryStates(
+    {
+      siteId: parseAsInteger,
+      start: parseAsInteger,
+      end: parseAsInteger,
+    },
+    {
+      defaultValue: {
+        start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
+        end: Math.floor(DateTime.now().toSeconds()),
+      },
+    },
+  );
+  const data = useDashboardData(view)?.pageviewsByDay;
   const dashed = [6, 6];
   return data ? (
     <Box h="300px">
@@ -390,7 +338,20 @@ const TopTable = ({
   column: string;
   dataKey: string;
 }) => {
-  const data = useDashboardData();
+  const [view] = useQueryStates(
+    {
+      siteId: parseAsInteger,
+      start: parseAsInteger,
+      end: parseAsInteger,
+    },
+    {
+      defaultValue: {
+        start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
+        end: Math.floor(DateTime.now().toSeconds()),
+      },
+    },
+  );
+  const data = useDashboardData(view);
   const rows = data?.[dataKey];
   const total = data?.countPageviews;
   const bg = useColorModeValue("gray.300", "gray.800");
