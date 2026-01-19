@@ -261,7 +261,11 @@ const DashboardStat = (props: {
 
 const DashboardStats = () => {
   const [view] = useDashboardView();
-  const data = useDashboardData(view);
+  const data = useDashboardData({
+    siteId: view.siteId ?? undefined,
+    start: view.start ?? undefined,
+    end: view.end ?? undefined,
+  });
   return (
     <HStack gap={10}>
       <DashboardStat
@@ -312,7 +316,11 @@ const DashboardStats = () => {
 
 const PageViewChart = () => {
   const [view] = useDashboardView();
-  const data = useDashboardData(view)?.pageviewsByDay;
+  const data = useDashboardData({
+    siteId: view.siteId ?? undefined,
+    start: view.start ?? undefined,
+    end: view.end ?? undefined,
+  })?.pageviewsByDay;
   const dashed = [6, 6];
   return data ? (
     <Box h="300px">
@@ -368,7 +376,11 @@ const TopTable = ({
   dataKey: string;
 }) => {
   const [view] = useDashboardView();
-  const data = useDashboardData(view);
+  const data = useDashboardData({
+    siteId: view.siteId ?? undefined,
+    start: view.start ?? undefined,
+    end: view.end ?? undefined,
+  });
   const rows = data?.[dataKey];
   const total = data?.countPageviews;
   const bg = useColorModeValue("gray.300", "gray.800");
