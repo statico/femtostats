@@ -28,12 +28,54 @@ import { useSiteEditor } from "components/SiteEditor";
 import { useBufferedValue } from "hooks/useBufferedValue";
 import { formatNumber, statPercent, statType, toURL } from "lib/misc";
 import { DateTime, Duration } from "luxon";
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, useMemo, useEffect, useRef } from "react";
 import { Chart } from "react-chartjs-2";
 import { MdPerson, MdSettings } from "react-icons/md";
 import useSWR from "swr";
 import { Country } from "../components/Country";
 import { useQueryStates, parseAsInteger } from "nuqs";
+
+// Stable default values to prevent infinite loops - calculated once at module load
+const DEFAULT_DATE_RANGE = (() => {
+  const now = DateTime.now();
+  return {
+    start: Math.floor(now.minus({ days: 31 }).toSeconds()),
+    end: Math.floor(now.toSeconds()),
+  };
+})();
+
+// Module-level flag to track initialization (shared across all component instances)
+let dateRangeInitialized = false;
+
+// Shared hook to manage dashboard view state
+const useDashboardView = () => {
+  const [view, setView] = useQueryStates(
+    {
+      siteId: parseAsInteger,
+      start: parseAsInteger,
+      end: parseAsInteger,
+    },
+    {
+      // Don't use defaultValue here to avoid conflicts
+      history: "push",
+    },
+  );
+
+  // Initialize default values only once on mount if query params are missing
+  useEffect(() => {
+    if (!dateRangeInitialized) {
+      if (view.start == null && view.end == null) {
+        dateRangeInitialized = true;
+        setView(DEFAULT_DATE_RANGE, { history: "replace" });
+      } else {
+        dateRangeInitialized = true;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
+
+  return [view, setView] as const;
+};
 
 const useDashboardData = (view: {
   siteId?: number;
@@ -141,19 +183,30 @@ const SiteSelector = () => {
 };
 
 const DateRangeSelector = () => {
-  const [, setView] = useQueryStates({
-    start: parseAsInteger,
-    end: parseAsInteger,
-  });
+  const [view, setView] = useDashboardView();
+
+  // Calculate which option should be selected based on current view
+  const selectedValue = useMemo(() => {
+    if (!view.start || !view.end) return "31";
+    const now = DateTime.now().toSeconds();
+    const daysAgo = now - view.start;
+    const days = Math.round(daysAgo / 86400);
+    if (days <= 7) return "7";
+    if (days <= 31) return "31";
+    if (days <= 90) return "90";
+    return "31";
+  }, [view.start, view.end]);
+
   return (
     <NativeSelect.Root maxW="xs">
       <NativeSelect.Field
-        defaultValue="31"
+        value={selectedValue}
         onChange={(e) => {
           const days = Number(e.target.value);
+          const now = DateTime.now();
           setView({
-            start: Math.floor(DateTime.now().minus({ days }).toSeconds()),
-            end: Math.floor(DateTime.now().toSeconds()),
+            start: Math.floor(now.minus({ days }).toSeconds()),
+            end: Math.floor(now.toSeconds()),
           });
         }}
       >
@@ -207,19 +260,7 @@ const DashboardStat = (props: {
 );
 
 const DashboardStats = () => {
-  const [view] = useQueryStates(
-    {
-      siteId: parseAsInteger,
-      start: parseAsInteger,
-      end: parseAsInteger,
-    },
-    {
-      defaultValue: {
-        start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
-        end: Math.floor(DateTime.now().toSeconds()),
-      },
-    },
-  );
+  const [view] = useDashboardView();
   const data = useDashboardData(view);
   return (
     <HStack gap={10}>
@@ -270,19 +311,7 @@ const DashboardStats = () => {
 };
 
 const PageViewChart = () => {
-  const [view] = useQueryStates(
-    {
-      siteId: parseAsInteger,
-      start: parseAsInteger,
-      end: parseAsInteger,
-    },
-    {
-      defaultValue: {
-        start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
-        end: Math.floor(DateTime.now().toSeconds()),
-      },
-    },
-  );
+  const [view] = useDashboardView();
   const data = useDashboardData(view)?.pageviewsByDay;
   const dashed = [6, 6];
   return data ? (
@@ -338,19 +367,7 @@ const TopTable = ({
   column: string;
   dataKey: string;
 }) => {
-  const [view] = useQueryStates(
-    {
-      siteId: parseAsInteger,
-      start: parseAsInteger,
-      end: parseAsInteger,
-    },
-    {
-      defaultValue: {
-        start: Math.floor(DateTime.now().minus({ days: 31 }).toSeconds()),
-        end: Math.floor(DateTime.now().toSeconds()),
-      },
-    },
-  );
+  const [view] = useDashboardView();
   const data = useDashboardData(view);
   const rows = data?.[dataKey];
   const total = data?.countPageviews;
